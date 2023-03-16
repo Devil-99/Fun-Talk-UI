@@ -28,7 +28,7 @@ function RegisterPage() {
                 localStorage.setItem('chat-app-user',JSON.stringify(data.user));
                 navigate("/");
             }
-        };
+        }
     }
 
     const toastOptions = {
@@ -42,6 +42,10 @@ function RegisterPage() {
         const {username,password,confirmPassword} = values;
         if(username.length<3){
             toast.error("Username length should be greater than 3 !", toastOptions);
+            return false;
+        }
+        if(username.length>10){
+            toast.error("Username length should be less than 10 !", toastOptions);
             return false;
         }
         if(username===""){
@@ -94,7 +98,6 @@ justify-content:center;
 gap:1rem;
 align-items:center;
 background-color: #232323;
-${'' /* background: url(${background}); */}
 .Brand{
     display:flex;
     align-items:center;

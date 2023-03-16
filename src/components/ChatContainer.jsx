@@ -55,7 +55,6 @@ const deleteMsg = async (msg)=>{
 
 // this useEffect works for 1st time render to setup the socket.
 useEffect(()=>{
-    console.log("2nd useEffect");
     if(socket.current){
         socket.current.on('msg-recieved',(msg)=>{
             setArrivalMessege({fromSelf:false, messege:msg});
@@ -68,13 +67,11 @@ useEffect(()=>{
 
 // This useEffect works when any msg received.
 useEffect(()=>{
-    console.log(arrivalMessege);
     arrivalMessege && setMesseges((prev)=>[...prev , arrivalMessege]);
 },[arrivalMessege]);
 
 // this works when new msg send or recieved so that the page scroll down to the end.
 useEffect(()=>{
-    console.log("4th useEffect");
     scrollRef.current?.scrollIntoView({behaviour:'smooth'});
 },[messeges]);
 

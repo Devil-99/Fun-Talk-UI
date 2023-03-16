@@ -6,3 +6,4 @@ export const allUsersRoute = `${host}/api/auth/allUsers`;
 export const sendMessegeRoute = `${host}/api/messeges/addmsg`;
 export const getAllMessegesRoutes = `${host}/api/messeges/getmsg`;
 export const deleteMessegeRoutes = `${host}/api/messeges/deletemsg`;
+export const renameRoute = `${host}/api/auth/updateUsername`;

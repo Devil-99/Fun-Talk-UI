@@ -5,8 +5,6 @@ import {ToastContainer, toast} from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
-import background from '../assets/black1.jpg';
-
 
 function LoginPage() {
 
@@ -82,7 +80,6 @@ justify-content:center;
 gap:1rem;
 align-items:center;
 background-color: #232323;
-${'' /* background: url(${background}); */}
 .Brand{
     display:flex;
     align-items:center;
