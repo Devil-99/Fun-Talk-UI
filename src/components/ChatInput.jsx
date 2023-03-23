@@ -54,7 +54,7 @@ padding: 0.5rem 1rem 0.5rem 1rem;
         color: white;
         border: none;
         padding-left: 1rem;
-        font-size: 1.2rem;
+        font-size: 1rem;
         &::selction{
             background-color: #9186f3;
         }
@@ -62,11 +62,11 @@ padding: 0.5rem 1rem 0.5rem 1rem;
             outline: none;
         }
         @media screen and (min-width: 250px) and (max-width: 500px){
-            font-size: 0.7rem;
+            font-size: 0.8rem;
         }
     }
     button{
-        padding: 0.3rem 2rem;
+        padding: 0.4rem 2rem;
         border-radius: 2rem;
         display:flex;
         justify-content: center;
@@ -78,9 +78,9 @@ padding: 0.5rem 1rem 0.5rem 1rem;
         }
         svg{
             @media screen and (min-width: 250px) and (max-width: 500px){
-                font-size: 1.5rem;
+                font-size: 1rem;
             }
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: white;
         }
     }

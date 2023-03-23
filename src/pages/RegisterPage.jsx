@@ -98,23 +98,23 @@ justify-content:center;
 gap:1rem;
 align-items:center;
 background-color: #232323;
-.Brand{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap: 1rem;
-}
-h1{
-    color:white;
-}
 form{
     display:flex;
     flex-direction:column;
-    gap: 2rem;
+    gap: 1rem;
     background-color: #00000060;
     box-shadow: -5px -5px 15px #3A3A3A, 10px 10px 20px #000000;
     border-radius: 4rem;
-    padding: 3rem 5rem;
+    padding: 2rem 4rem;
+    .Brand{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap: 1rem;
+    }
+    h1{
+        color:white;
+    }
     input{
         background-color:transparent;
         padding: 1rem;
@@ -122,7 +122,7 @@ form{
         border-radius: 0.4rem;
         color:white;
         width:1005;
-        font-size: 1rem;
+        font-size: 0.8rem;
         &:focus{
             border: 0.1rem solid #FFA136;
             outline:none;
@@ -132,12 +132,12 @@ form{
         background-color: #FF5605;
         background-image: linear-gradient(to left, #FF5605, #FFA136);
         color: white;
-        padding: 1rem 2rem;
+        padding: 0.8rem 2rem;
         border: none;
         font-weight: bold;
         cursor: pointer;
         border-radius: 0.4rem;
-        font-size: 1rem;
+        font-size: 0.9rem;
         text-transform:uppercase;
         transition: 0.5s ease-in-out;
         &:hover{
@@ -147,6 +147,7 @@ form{
     }
     span{
         color: white;
+        font-size:0.8rem;
         a{
             color: #FF5605;
             text-decoration:none;

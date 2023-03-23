@@ -26,7 +26,7 @@ background-color: #FF5605;
 border: none;
 cursor: pointer;
 svg{
-    font-size: 1.5rem;
+    font-size: 1rem;
     color: #ffffff;
     @media screen and (min-width: 250px) and (max-width: 500px){
     font-size: 1rem;

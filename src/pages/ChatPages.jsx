@@ -7,6 +7,7 @@ import Contacts from '../components/Contacts';
 import Welcome from '../components/Welcome';
 import ChatContainer from '../components/ChatContainer';
 import {io} from 'socket.io-client';
+import PreLoader from '../components/PreLoader';
 
 function ChatPages() {
   const navigate = useNavigate();
@@ -15,7 +16,8 @@ function ChatPages() {
   const [contacts, setContacts] = useState([]);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [currentChat, setCurrentChat] = useState(undefined);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLogged, setIsLogged] = useState(false);
+  const [preloader, setPreloader] = useState(false);
 
   useEffect(()=>{
     async function getData(){
@@ -23,7 +25,7 @@ function ChatPages() {
         navigate('/login');
       }
       else{
-        setIsLoaded(true);
+        setIsLogged(true);
         setCurrentUser(await JSON.parse(localStorage.getItem("chat-app-user")));
       }
     }
@@ -39,10 +41,12 @@ function ChatPages() {
   },[currentUser]);
 
   useEffect(()=>{
+    setPreloader(true);
     async function fetchCurrentUser(){
       if(currentUser){
         const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
         setContacts(data.data);
+        setPreloader(false);
       }
     }
   fetchCurrentUser();
@@ -53,14 +57,19 @@ function ChatPages() {
   }
 
   return (<Container>
-    <div className='container'>
-      <Contacts allcontacts={contacts} currUser={currentUser} changeChat={handleChatChange} />
-      {
-        isLoaded && currentChat === undefined ?
-        (<Welcome currUser={currentUser} />):
-        (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket}/>)
-      }
-    </div>
+    {
+      preloader? 
+      <PreLoader preloader={preloader}/>
+      :
+      <div className='container'>
+        <Contacts allcontacts={contacts} currUser={currentUser} changeChat={handleChatChange}/>
+        {
+          isLogged && currentChat === undefined ?
+          (<Welcome currUser={currentUser} />):
+          (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket}/>)
+        }
+      </div>
+    }
   </Container>
   )
 }

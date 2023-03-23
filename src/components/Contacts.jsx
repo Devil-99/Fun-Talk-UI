@@ -43,7 +43,7 @@ export default function Contacts({ allcontacts , currUser , changeChat }) {
                 </div>
                 <div className='current-user'>
                     <div className='username' onClick={()=>changeCurrentChat(undefined,undefined)}>
-                        <h2>{currentUserName}</h2>
+                        <h2 title="Go to Home">{currentUserName}</h2>
                     </div>
                 </div>
             </Container>
@@ -72,7 +72,7 @@ border-radius: 3rem;
     color: Yellow;
     @media screen and (min-width: 250px) and (max-width: 500px){
         h1{
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }        
     }
 }
@@ -94,15 +94,14 @@ border-radius: 3rem;
         display: flex;
         align-items:center;
         background-color: #00000090;
-        min-height: 2rem;
+        min-height: 1.5rem;
         width: 90%;
         border-radius: 2rem;
-        padding: 0.5rem;
-        gap: 1rem;
+        padding: 0.4rem 0 0.4rem 0;
         cursor: pointer;
         transition: 0.2s ease-in-out;
         @media screen and (min-width: 250px) and (max-width: 500px){
-            padding: 0.5rem;    
+            padding: 0.4rem;    
             width: 75%;
             border-radius: 0.5rem;
         }
@@ -110,6 +109,7 @@ border-radius: 3rem;
             overflow: hidden;
             margin-left: 1rem;
             h3{
+                font-size: 0.9rem;
                 color: white;
             }
             @media screen and (min-width: 250px) and (max-width: 500px){
@@ -131,27 +131,24 @@ border-radius: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    @media screen and (min-width: 250px) and (max-width: 500px){
-        gap: 0.2rem;    
-    }
     .username{
         cursor: pointer;
+        text-align:center;
         h2{
             @media screen and (min-width: 250px) and (max-width: 500px){
-                font-size: 1.5rem;
+                font-size: 1rem;
                 padding: 0.25rem 0.8rem 0.25rem 0.8rem;
                 margin: 0rem;
             }
+            font-size:1.2rem;
             background-color: #FF3305;
             transition: 0.5s ease-in-out;
             &:hover{
                 background-color: #CB0000;
             }
-            padding: 0.5rem 1rem 0.5rem 1rem;
+            padding: 0.4rem 1rem 0.4rem 1rem;
             border-radius: 2rem;
             color:white;
-            margin:0;
         }
     }
 }

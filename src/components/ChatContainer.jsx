@@ -7,24 +7,28 @@ import {v4 as uuidv4} from 'uuid';
 import ChatHeader from './ChatHeader';
 import {MdDelete} from 'react-icons/md';
 import background from '../assets/black1.jpg';
+import PreLoader from './PreLoader';
 
 export default function ChatContainer({currentChat,currentUser,socket}) {
     const [messeges,setMesseges] = useState([]);
     const [arrivalMessege,setArrivalMessege] = useState(null);
+    const [preloader, setPreloader] = useState(false);
     const scrollRef = useRef();
 
-    async function fetchData(){
-        const response = await axios.post(getAllMessegesRoutes,{
-            from: currentUser._id,
-            to: currentChat._id,
-        });
-        setMesseges(response.data);
-    }
+async function fetchData(){
+    setPreloader(true);
+    const response = await axios.post(getAllMessegesRoutes,{
+        from: currentUser._id,
+        to: currentChat._id,
+    });
+    setMesseges(response.data);
+    setPreloader(false);
+}
 
-    // this render the page whenever a chat is selected
-    useEffect(()=>{
-        fetchData();
-    },[currentChat]);
+// this render the page whenever a chat is selected
+useEffect(()=>{
+    fetchData();
+},[currentChat]);
 
 const handleSendMsg = async (msg)=>{
     await axios.post(sendMessegeRoute,{
@@ -81,24 +85,30 @@ useEffect(()=>{
             currentChat && (
                 <Container>
                     <ChatHeader currentChat={currentChat}/>
-                    <div className='chat-messeges' >
-                        {
-                            messeges.map((messege)=>{
-                                return (
-                                <div ref={scrollRef} key={uuidv4()}>
-                                    <div className={`messege ${messege.fromSelf ? "sended" : "recieved"}`}>
-                                        <div className='content'>
-                                            <p>{messege.messege}</p>
-                                            { messege.fromSelf===true ? 
-                                                (<button className='delete' onClick={(event)=>deleteMsg(messege)}><MdDelete/></button>)
-                                            :<></>}
+                    {
+                        preloader ?
+                        <PreLoader preloader={preloader}/>
+                        :
+                        <div className='chat-messeges' >
+                            {
+                                messeges.map((messege)=>{
+                                    return (
+                                    <div ref={scrollRef} key={uuidv4()}>
+                                        <div className={`messege ${messege.fromSelf ? "sended" : "recieved"}`}>
+                                            <div className='content'>
+                                                <p>{messege.messege}</p>
+                                                { messege.fromSelf===true ? 
+                                                    (<button className='delete' onClick={(event)=>deleteMsg(messege)}><MdDelete/></button>)
+                                                :<></>}
+                                                {/* <i>{messege.date}</i> */}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                )
-                            })
-                        }
-                    </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    }
                     <ChatInput handleSendMsg={handleSendMsg}/>
                 </Container>
             )
@@ -121,7 +131,7 @@ box-shadow: 10px 10px 20px #000000;
     padding: 1rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
     overflow: auto;
     background: url(${background});
     &::-webkit-scrollbar{
@@ -145,20 +155,20 @@ box-shadow: 10px 10px 20px #000000;
             overflow-wrap: break-word;
             border-radius: 1rem;
             color: #d1d1d1;
-            font-size: 1.3rem;
-            i{
+            font-size: 1rem;
+            ${'' /* i{
                 display:none;
                 font-size:0.8rem;
-                margin-left: 2rem;
             }
             &:hover{
                 i{
-                color:grey;
+                color:black;
                 display:block;
+                margin-right: 0.5rem;
                 }
-            }
+            } */}
             p{
-                margin: 0.2rem;
+                margin: 0.1rem;
                 @media screen and (min-width: 250px) and (max-width: 800px){
                     font-size: 0.8rem;
                 }
@@ -169,9 +179,9 @@ box-shadow: 10px 10px 20px #000000;
                 cursor: pointer;
                 svg{
                     margin:0;
-                    font-size: 1.8rem;
+                    font-size: 1.5rem;
                     @media screen and (min-width: 250px) and (max-width: 800px){
-                        font-size: 0.8rem;
+                        font-size: 1rem;
                     }
                 }
             }
@@ -180,7 +190,7 @@ box-shadow: 10px 10px 20px #000000;
     .sended{
         justify-content: flex-end;
         .content{
-            padding: 1rem 0 1rem 1rem;
+            padding: 0.7rem 0 0.7rem 1rem;
             background-color: #56D2FE;
             color: white;
             background-image: linear-gradient(to left, #56D2FE, #202FFF);
@@ -192,7 +202,7 @@ box-shadow: 10px 10px 20px #000000;
     .recieved{
         justify-content: flex-start;
         .content{
-            padding: 1rem;
+            padding: 0.7rem 0.8rem 0.7rem 0.8rem;
             background-color: #FF8FB3;
             background-image: linear-gradient(to left, #FF8FB3, #FAC8F4);
             color: black;

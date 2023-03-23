@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
-import {BsFacebook , BsWhatsapp , BsInstagram , BsLinkedin} from 'react-icons/bs';
 import {AiFillEdit} from 'react-icons/ai';
 import axios from 'axios';
 import { renameRoute } from '../utils/apiRoutes';
+import WelcomeFooter from './WelcomeFooter';
 
 export default function Welcome({currUser}) {
   const navigate = useNavigate();
@@ -21,7 +21,8 @@ export default function Welcome({currUser}) {
       }
       if(data.status === true){
           localStorage.setItem('chat-app-user',JSON.stringify(data.user));
-          navigate('/login');
+          navigate('/');
+          window.location.reload(true);
       }
     }
   }
@@ -41,16 +42,8 @@ export default function Welcome({currUser}) {
               <button className='editButton' onClick={rename}><AiFillEdit/></button>
               </div>
               <h3>Please select a chat to start messaging</h3>
-              <h3>Click on Your Name to back to Welcome page</h3>
 
-              <div className='social'>
-              
-              <a className='fb' href='https://facebook.com/'><BsFacebook/></a>
-              <a className='wp' href='https://web.whatsapp.com/'><BsWhatsapp/></a>
-              <a className='insta' href='https://instagram.com/'><BsInstagram/></a>
-              <a className='linkedin' href='https://www.linkedin.com/feed/'><BsLinkedin/></a>
-              </div>
-
+              <WelcomeFooter/>
             </div>
           </Container>
         )
@@ -67,7 +60,9 @@ color: white;
 overflow: hidden;
 border-radius: 1rem;
 background-color: #00000060;
+box-shadow: 10px 10px 20px #000000;
 .mainBlock{
+  margin-top:1rem;
   display:flex;
   flex-direction: column;
   justify-content: center;
@@ -91,6 +86,14 @@ background-color: #00000060;
       }
     }
   }
+  h1{
+    margin:0.5rem;
+    font-size: 2rem;
+  }
+  h3{
+    margin:0.5rem;
+    font-size: 1rem;
+  }
   @media screen and (min-width: 250px) and (max-width: 500px){
     h1{
       font-size: 1.2rem;
@@ -107,70 +110,6 @@ background-color: #00000060;
   }
   span{
       color: #FF5605;
-  }
-  .social{
-    display: flex;
-    flex-direction: row;
-    margin: 1rem 0;
-    gap: 1rem;
-    .fb{
-      background-color: white;
-      height:100%;
-      border-radius: 50%;
-      svg{
-        height: 100%;
-        width: 100%;
-        color: #3b5998;
-        font-size: 2rem;
-        @media screen and (min-width: 250px) and (max-width: 500px){
-          font-size: 1rem;
-        }
-      }
-    }
-    .wp{
-      background-color: #25D366;
-      height:100%;
-      border-radius: 50%;
-      svg{
-        height: 100%;
-        width: 100%;
-        color: white;
-        font-size: 2rem;
-        @media screen and (min-width: 250px) and (max-width: 500px){
-          font-size: 1rem;
-        }
-      }
-    }
-    .insta{
-      background-color: #C13584;
-      height:100%;
-      background-image: linear-gradient(to bottom,#C13584, #F77737);
-      border-radius: 30%;
-      svg{
-        height: 100%;
-        width: 100%;
-        color: white;
-        font-size: 2rem;
-        @media screen and (min-width: 250px) and (max-width: 500px){
-          font-size: 1rem;
-        }
-      }
-    }
-    .linkedin{
-      background-color: white;
-      height:100%;
-      border-radius: 10%;
-      svg{
-        height: 100%;
-        width: 100%;
-        color: #0A66C2;
-        font-size: 2rem;
-        @media screen and (min-width: 250px) and (max-width: 500px){
-          font-size: 1rem;
-        }
-      }
-    }
-
   }
 }
 `;
