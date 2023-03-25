@@ -32,7 +32,7 @@ export default function Welcome({currUser}) {
       {
         currUser && (
           <Container>
-            <ChatHeader currentChat={currUser}/>
+            <ChatHeader currentChat={currUser} isOnline={true}/>
             <div className='mainBlock'>
               <img src={Robot} alt="robot"/>
               <div className='edit'>

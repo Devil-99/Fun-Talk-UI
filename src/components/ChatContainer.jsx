@@ -8,11 +8,13 @@ import ChatHeader from './ChatHeader';
 import {MdDelete} from 'react-icons/md';
 import background from '../assets/black1.jpg';
 import PreLoader from './PreLoader';
+import {format} from 'timeago.js';
 
 export default function ChatContainer({currentChat,currentUser,socket}) {
     const [messeges,setMesseges] = useState([]);
     const [arrivalMessege,setArrivalMessege] = useState(null);
     const [preloader, setPreloader] = useState(false);
+    const [isonline, setIsonline] = useState(false);
     const scrollRef = useRef();
 
 async function fetchData(){
@@ -21,6 +23,10 @@ async function fetchData(){
         from: currentUser._id,
         to: currentChat._id,
     });
+    socket.current.emit('online',currentChat._id);
+        socket.current.on('isOnline',(data)=>{
+            setIsonline(data);
+    })
     setMesseges(response.data);
     setPreloader(false);
 }
@@ -84,7 +90,7 @@ useEffect(()=>{
         {
             currentChat && (
                 <Container>
-                    <ChatHeader currentChat={currentChat}/>
+                    <ChatHeader currentChat={currentChat} isOnline={isonline}/>
                     {
                         preloader ?
                         <PreLoader preloader={preloader}/>
@@ -96,11 +102,13 @@ useEffect(()=>{
                                     <div ref={scrollRef} key={uuidv4()}>
                                         <div className={`messege ${messege.fromSelf ? "sended" : "recieved"}`}>
                                             <div className='content'>
-                                                <p>{messege.messege}</p>
-                                                { messege.fromSelf===true ? 
-                                                    (<button className='delete' onClick={(event)=>deleteMsg(messege)}><MdDelete/></button>)
-                                                :<></>}
-                                                {/* <i>{messege.date}</i> */}
+                                                <div className='msgfield'>
+                                                    <p>{messege.messege}</p>
+                                                    { messege.fromSelf===true ? 
+                                                        (<button className='delete' onClick={(event)=>deleteMsg(messege)}><MdDelete/></button>)
+                                                    :<p></p>}
+                                                </div>
+                                                <i>{format(messege.date)}</i>
                                             </div>
                                         </div>
                                     </div>
@@ -150,38 +158,39 @@ box-shadow: 10px 10px 20px #000000;
         align-items: center;
         .content{
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             max-width: 50%;
             overflow-wrap: break-word;
             border-radius: 1rem;
             color: #d1d1d1;
-            font-size: 1rem;
-            ${'' /* i{
-                display:none;
-                font-size:0.8rem;
-            }
-            &:hover{
-                i{
-                color:black;
-                display:block;
-                margin-right: 0.5rem;
-                }
-            } */}
-            p{
-                margin: 0.1rem;
+            i{
+                text-align:right;
+                margin-right:0.5rem;
+                font-size:0.5rem;
                 @media screen and (min-width: 250px) and (max-width: 800px){
-                    font-size: 0.8rem;
+                    font-size: 0.1rem;
                 }
             }
-            .delete{
-                background:none;
-                border:none;
-                cursor: pointer;
-                svg{
-                    margin:0;
-                    font-size: 1.5rem;
+            .msgfield{
+                display:flex;
+                flex-direction:row;
+                p{
+                    margin: 0.1rem;
+                    texi-align:center;
                     @media screen and (min-width: 250px) and (max-width: 800px){
-                        font-size: 1rem;
+                        font-size: 0.8rem;
+                    }
+                }
+                .delete{
+                    background:none;
+                    border:none;
+                    cursor: pointer;
+                    svg{
+                        margin:0;
+                        font-size: 1.5rem;
+                        @media screen and (min-width: 250px) and (max-width: 800px){
+                            font-size: 1rem;
+                        }
                     }
                 }
             }
