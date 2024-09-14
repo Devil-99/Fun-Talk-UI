@@ -14,15 +14,15 @@ function ChatPages() {
   const socket = useRef();
 
   const [contacts, setContacts] = useState([]);
-  const [currentUser, setCurrentUser] = useState(undefined);
+  const [currentUser, setCurrentUser] = useState({username: 'Souvik'});
   const [currentChat, setCurrentChat] = useState(undefined);
-  const [isLogged, setIsLogged] = useState(false);
+  const [isLogged, setIsLogged] = useState(true);
   const [preloader, setPreloader] = useState(false);
 
   useEffect(()=>{
     async function getData(){
       if(!localStorage.getItem("chat-app-user")){
-        navigate('/login');
+        // navigate('/login');
       }
       else{
         setIsLogged(true);
@@ -33,24 +33,24 @@ function ChatPages() {
   },[]);
 
   // socket connection establishment
-  useEffect(()=>{
-    if(currentUser){
-      socket.current=io(host);
-      socket.current.emit('add-user',currentUser._id);
-    }
-  },[currentUser]);
+  // useEffect(()=>{
+  //   if(currentUser){
+  //     socket.current=io(host);
+  //     socket.current.emit('add-user',currentUser._id);
+  //   }
+  // },[currentUser]);
 
-  useEffect(()=>{
-    setPreloader(true);
-    async function fetchCurrentUser(){
-      if(currentUser){
-        const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-        setContacts(data.data);
-        setPreloader(false);
-      }
-    }
-  fetchCurrentUser();
-  },[currentUser]);
+  // useEffect(()=>{
+  //   // setPreloader(true);
+  //   async function fetchCurrentUser(){
+  //     if(currentUser){
+  //       const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+  //       setContacts(data.data);
+  //       // setPreloader(false);
+  //     }
+  //   }
+  // fetchCurrentUser();
+  // },[currentUser]);
 
   const handleChatChange = (chat)=>{
     setCurrentChat(chat);

@@ -1,7 +1,7 @@
-import { React , useState } from 'react';
+import { React, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import {ToastContainer, toast} from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { registerRoute } from '../utils/apiRoutes';
@@ -9,24 +9,39 @@ import { registerRoute } from '../utils/apiRoutes';
 function RegisterPage() {
 
     const navigate = useNavigate();
-    const [values,setValues] = useState({
-        username:"Abc",
-        email:"abc@gmail.com",
-        password:"12345",
-        confirmPassword:"12345"
+    const [values, setValues] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
     });
 
-    const handleSubmit = async (event)=>{
-        event.preventDefault();
-        if(handleValidation()){
-            const {username,email,password} = values;
-            const {data} = await axios.post(registerRoute,{username,email,password});
-            if(data.status === false){
-                toast.error(data.msg, toastOptions);
-            }
-            if(data.status === true){
-                localStorage.setItem('chat-app-user',JSON.stringify(data.user));
-                navigate("/");
+    const handleSubmit = async (event) => {
+        event.preventDefault();  // Prevents page refresh
+
+        if (handleValidation()) {
+            try {
+                const response = await axios.post(registerRoute, values);
+                if(response.status === 200){
+                    navigate('/login');
+                }
+            } catch (error) {
+                if (error.response) {
+                    const { status, data } = error.response;
+                    setValues({
+                        username: "",
+                        email: "",
+                        password: "",
+                        confirmPassword: ""
+                    });
+                    toast.error(data.message, toastOptions);
+                } else if (error.request) {
+                    // No response from server (network issue)
+                    toast.error('Network error. Please check your connection.', toastOptions);
+                } else {
+                    // Other errors (coding issues, etc.)
+                    toast.error('An unexpected error occurred. Please try again.', toastOptions);
+                }
             }
         }
     }
@@ -35,58 +50,75 @@ function RegisterPage() {
         position: "bottom-right",
         autoClose: 5000,
         pauseOnHover: true,
-        draggable:true,
+        draggable: true,
         theme: "dark"
     }
-    const handleValidation = ()=>{
-        const {username,password,confirmPassword} = values;
-        if(username.length<3){
+    const handleValidation = () => {
+        const { username, password, confirmPassword } = values;
+        if (username.length < 3) {
+            setValues((prev) => ({
+                ...prev,
+                username: ""
+            }));
             toast.error("Username length should be greater than 3 !", toastOptions);
             return false;
         }
-        if(username.length>10){
+        if (username.length > 10) {
+            setValues((prev) => ({
+                ...prev,
+                username: ""
+            }));
             toast.error("Username length should be less than 10 !", toastOptions);
             return false;
         }
-        if(username===""){
+        if (username === "") {
             toast.error("Username is required !", toastOptions);
             return false;
         }
-        if(password.length<5){
+        if (password.length < 5) {
+            setValues((prev) => ({
+                ...prev,
+                password: ""
+            }));
             toast.error("Password length should be greater than 5 !", toastOptions);
             return false;
         }
-        else if(password !== confirmPassword){
+        else if (password !== confirmPassword) {
+            setValues((prev) => ({
+                ...prev,
+                password: "",
+                confirmPassword: ""
+            }));
             toast.error("Password and Confirm Password should be same !", toastOptions);
             return false;
         }
-        else{
+        else {
             return true;
         }
     }
 
-    const handleChange = (e)=>{
-        setValues({...values,[e.target.name]:e.target.value });
+    const handleChange = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value });
     }
 
-  return (
-    <>
-        <FormContainer>
-            <form onSubmit={(event)=>handleSubmit(event)}>
-                <div className='Brand'>
-                    <h1>FunTalk</h1>
-                </div>
-                <input type="text" placeholder='Username' name='username' onChange={(e)=>handleChange(e)}/>
-                <input type="email" placeholder='Email' name='email' onChange={(e)=>handleChange(e)}/>
-                <input type="password" placeholder='Password' name='password' onChange={(e)=>handleChange(e)}/>
-                <input type="password" placeholder='Confirm Password' name='confirmPassword' onChange={(e)=>handleChange(e)}/>
-                <button type='submit' onClick={handleSubmit}>Create User</button>
-                <span>Already have an account ? <Link to="/login">Login</Link></span>
-            </form>
-        </FormContainer>
-        <ToastContainer />
-    </>
-  )
+    return (
+        <>
+            <FormContainer>
+                <form onSubmit={(event) => handleSubmit(event)}>
+                    <div className='Brand'>
+                        <h1>FunTalk</h1>
+                    </div>
+                    <input type="text" placeholder='Username' name='username' value={values.username} onChange={(e) => handleChange(e)} />
+                    <input type="email" placeholder='Email' name='email' value={values.email} onChange={(e) => handleChange(e)} />
+                    <input type="password" placeholder='Password' name='password' value={values.password} onChange={(e) => handleChange(e)} />
+                    <input type="password" placeholder='Confirm Password' name='confirmPassword' value={values.confirmPassword} onChange={(e) => handleChange(e)} />
+                    <button type='submit' onClick={handleSubmit}>Create User</button>
+                    <span>Already have an account ? <Link to="/login">Login</Link></span>
+                </form>
+            </FormContainer>
+            <ToastContainer />
+        </>
+    )
 }
 
 const FormContainer = styled.div`

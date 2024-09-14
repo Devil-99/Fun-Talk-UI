@@ -1,7 +1,7 @@
-import { React , useState } from 'react';
+import { React, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import {ToastContainer, toast} from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
@@ -9,66 +9,76 @@ import { loginRoute } from '../utils/apiRoutes';
 function LoginPage() {
 
     const navigate = useNavigate();
-    const [values,setValues] = useState({
-        username:"",
-        password:""
+    const [values, setValues] = useState({
+        mail: "",
+        password: ""
     });
 
-    const handleSubmit = async (event)=>{
-        event.preventDefault();
-        if(handleValidation()){
-            const {username,password} = values;
-            const {data} = await axios.post(loginRoute,{username,password});
-            if(data.status === false){
-                toast.error(data.msg, toastOptions);
+    const handleSubmit = async (event) => {
+        event.preventDefault();  // Prevents page refresh
+        if (handleValidation()) {
+            try {
+                const response = await axios.post(loginRoute, values);
+                if (response.status === 200) {
+                    localStorage.setItem('TechTalk-user', JSON.stringify(response.data));
+                    navigate('/');
+                }
+            } catch (error) {
+                if (error.response) {
+                    // Errors returned from the server (4xx, 5xx responses)
+                    const { status, data } = error.response;
+                    toast.error(data.message, toastOptions);
+                } else if (error.request) {
+                    // No response from server (network issue)
+                    toast.error('Network error. Please check your connection.', toastOptions);
+                } else {
+                    // Other errors (coding issues, etc.)
+                    toast.error('An unexpected error occurred. Please try again.', toastOptions);
+                }
             }
-            if(data.status === true){
-                localStorage.setItem('chat-app-user',JSON.stringify(data.user));
-                navigate("/");
-            }
-        };
-    }
+        }
+    };
 
     const toastOptions = {
         position: "bottom-right",
         autoClose: 5000,
         pauseOnHover: true,
-        draggable:true,
+        draggable: true,
         theme: "dark"
     }
-    const handleValidation = ()=>{
-        const {username,password} = values;
-        if(username===""){
-            toast.error("Username is required !", toastOptions);
+    const handleValidation = () => {
+        const { mail, password } = values;
+        if (mail === "") {
+            toast.error("Email is required !", toastOptions);
             return false;
         }
-        if(password===""){
-          toast.error("Password is required !", toastOptions);
-          return false;
+        if (password === "") {
+            toast.error("Password is required !", toastOptions);
+            return false;
         }
         return true;
     }
 
-    const handleChange = (e)=>{
-        setValues({...values,[e.target.name]:e.target.value });
+    const handleChange = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value });
     }
-// console.log("Login Page");
-  return (
-    <>
-        <FormContainer>
-            <form onSubmit={(event)=>handleSubmit(event)}>
-                <div className='Brand'>
-                    <h1>FunTalk</h1>
-                </div>
-                <input type="text" placeholder='Username' name='username' onChange={(e)=>handleChange(e)}/>
-                <input type="password" placeholder='Password' name='password' onChange={(e)=>handleChange(e)}/>
-                <button type='submit' onClick={handleSubmit}>Login</button>
-                <span>Don't have an account ? <Link to="/register">Register</Link></span>
-            </form>
-        </FormContainer>
-        <ToastContainer />
-    </>
-  )
+
+    return (
+        <>
+            <FormContainer>
+                <form onSubmit={(event) => handleSubmit(event)}>
+                    <div className='Brand'>
+                        <h1>FunTalk</h1>
+                    </div>
+                    <input type="text" placeholder='Email' name='mail' onChange={(e) => handleChange(e)} />
+                    <input type="password" placeholder='Password' name='password' onChange={(e) => handleChange(e)} />
+                    <button type='submit' onClick={handleSubmit}>Login</button>
+                    <span>Don't have an account ? <Link to="/register">Register</Link></span>
+                </form>
+            </FormContainer>
+            <ToastContainer />
+        </>
+    )
 }
 
 const FormContainer = styled.div`

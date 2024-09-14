@@ -1,28 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
-import {AiFillEdit} from 'react-icons/ai';
+import { AiFillEdit } from 'react-icons/ai';
 import axios from 'axios';
 import { renameRoute } from '../utils/apiRoutes';
 import WelcomeFooter from './WelcomeFooter';
+import { TiTick } from "react-icons/ti";
 
-export default function Welcome({currUser}) {
+export default function Welcome({ currUser }) {
   const navigate = useNavigate();
-  const rename = async ()=>{
-    const newUsername = prompt("Enter your new Username here.\nUsername should be greater than 3 letters and less than 10 letters !");
-    if(newUsername==null)
+  const [newUsername, setNewUsername] = useState(currUser.username);
+  const handleRename = (e) => {
+    setNewUsername(e.target.value);
+  }
+  const [editable, setEditable] = useState(false);
+  const handleSave = async () => {
+    setEditable(false);
+    if (newUsername == null)
       navigate('/');
-    else{
-      const {data} = await axios.post(renameRoute,{currUser,newUsername});
-      if(data.status === false){
-          console.error(data.msg);
+    else {
+      const { data } = await axios.post(renameRoute, { currUser, newUsername });
+      if (data.status === false) {
+        console.error(data.msg);
       }
-      if(data.status === true){
-          localStorage.setItem('chat-app-user',JSON.stringify(data.user));
-          navigate('/');
-          window.location.reload(true);
+      if (data.status === true) {
+        localStorage.setItem('chat-app-user', JSON.stringify(data.user));
+        navigate('/');
+        window.location.reload(true);
       }
     }
   }
@@ -32,24 +38,32 @@ export default function Welcome({currUser}) {
       {
         currUser && (
           <Container>
-            <ChatHeader currentChat={currUser} isOnline={true}/>
+            <ChatHeader currentChat={currUser} isOnline={true} />
             <div className='mainBlock'>
-              <img src={Robot} alt="robot"/>
+              <img src={Robot} alt="robot" />
               <div className='edit'>
-              <h1>
-                  Welcome, <span>{currUser.username}!</span>
-              </h1>
-              <button className='editButton' onClick={rename}><AiFillEdit/></button>
+                <h1>Welcome</h1>
+                {
+                  editable ?
+                    <>
+                      <input className='renameInput' value={newUsername} onChange={handleRename} />
+                      <button className='editButton' onClick={() => handleSave()}><TiTick style={{ color: 'greenyellow' }} /></button>
+                    </>
+                    :
+                    <>
+                      <h1 className='username'>{currUser.username}</h1>
+                      <button className='editButton' onClick={() => setEditable(true)}><AiFillEdit /></button>
+                    </>
+                }
               </div>
               <h3>Please select a chat to start messaging</h3>
-
-              <WelcomeFooter/>
+              <WelcomeFooter />
             </div>
           </Container>
         )
       }
     </>
-    
+
   )
 }
 
@@ -72,6 +86,9 @@ box-shadow: 10px 10px 20px #000000;
     flex-direction:row;
     gap:0.5rem;
     align-items:center;
+    .username{
+      color: #FF5605;
+    }
     .editButton{
       background-color:transparent;
       padding:0;
