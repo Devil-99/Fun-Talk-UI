@@ -1,55 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { usersRoute } from '../utils/apiRoutes';
+import { ToastContainer, toast } from 'react-toastify';
+import { toastOptions } from '../utils/toastOptions';
 
-export default function Contacts({ allcontacts , currUser , changeChat }) {
+export default function Contacts({ currentUser, selectedUser, setSelectedUser }) {
+    const [allusers, setAllusers] = useState([]); 
 
-    const [currentUserName,setCurrentUserName] = useState(undefined);
-    const [currentSelected,setCurrentSelected] = useState(undefined);
-
-    useEffect(()=>{
-        if(currUser){
-            setCurrentUserName(currUser.username);
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get(usersRoute, { params: { user_id: currentUser.user_id } });
+            
+            if (response.status === 200)
+                setAllusers(response.data);
+        } catch (error) {
+            console.log(error);
+            if (error.response) {
+                const { status, data } = error.response;
+                toast.error(data.message, toastOptions);
+            } else if (error.request) {
+                toast.error('Network error. Please check your connection.', toastOptions);
+            } else {
+                toast.error('An unexpected error occurred. Please try again.', toastOptions);
+            }
         }
-    },[currUser]);
-
-    const changeCurrentChat =(index, contact)=>{
-        setCurrentSelected(index);
-        changeChat(contact);
     }
 
+    useEffect(() => {
+        if (currentUser)
+            fetchUsers();
+    }, []); 
+
     return (
-    <>
-       {currentUserName && 
-            (
-            <Container>
-                <div className='brand'>
-                    <h1>FunTalk</h1>
-                </div>
-                <div className='contacts'>
-                    {
-                        allcontacts.map((contact,index)=>{
-                            return (
-                                <div className={`contact ${index === currentSelected ? "selected":""}`} 
-                                key={index} 
-                                onClick={()=>changeCurrentChat(index,contact)}
-                                >
-                                    <div className='username'>
-                                        <h3>{contact.username}</h3>
-                                    </div>
+        <Container>
+            <div className='brand'>
+                <h1>FunTalk</h1>
+            </div>
+            <div className='contacts'>
+                {
+                    allusers.map((user, index) => {
+                        return (
+                            <div className={`contact ${selectedUser && user.user_id === selectedUser.user_id ? "selected" : ""}`}
+                                key={index}
+                                onClick={() => setSelectedUser(user)}
+                            >
+                                <div className='username'>
+                                    <h3>{user.username}</h3>
                                 </div>
-                            )
-                        })
-                    }
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <div className='current-user'>
+                <div className='username' onClick={() => setSelectedUser(null)}>
+                    <h2 title="Go to Home">{"Home"}</h2>
                 </div>
-                <div className='current-user'>
-                    <div className='username' onClick={()=>changeCurrentChat(undefined,undefined)}>
-                        <h2 title="Go to Home">{currentUserName}</h2>
-                    </div>
-                </div>
-            </Container>
-            )
-        }
-    </>
+            </div>
+            <ToastContainer />
+        </Container>
     )
 }
 

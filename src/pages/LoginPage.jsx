@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
+import {toastOptions} from '../utils/toastOptions';
 
 function LoginPage() {
 
@@ -39,13 +40,6 @@ function LoginPage() {
         }
     };
 
-    const toastOptions = {
-        position: "bottom-right",
-        autoClose: 5000,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark"
-    }
     const handleValidation = () => {
         const { mail, password } = values;
         if (mail === "") {

@@ -9,9 +9,9 @@ import { renameRoute } from '../utils/apiRoutes';
 import WelcomeFooter from './WelcomeFooter';
 import { TiTick } from "react-icons/ti";
 
-export default function Welcome({ currUser }) {
+export default function Welcome({ currentUser }) {
   const navigate = useNavigate();
-  const [newUsername, setNewUsername] = useState(currUser.username);
+  const [newUsername, setNewUsername] = useState(currentUser.username);
   const handleRename = (e) => {
     setNewUsername(e.target.value);
   }
@@ -21,7 +21,7 @@ export default function Welcome({ currUser }) {
     if (newUsername == null)
       navigate('/');
     else {
-      const { data } = await axios.post(renameRoute, { currUser, newUsername });
+      const { data } = await axios.post(renameRoute, { currentUser, newUsername });
       if (data.status === false) {
         console.error(data.msg);
       }
@@ -36,9 +36,9 @@ export default function Welcome({ currUser }) {
   return (
     <>
       {
-        currUser && (
+        currentUser && (
           <Container>
-            <ChatHeader currentChat={currUser} isOnline={true} />
+            <ChatHeader selectedUser={currentUser} isOnline={true} />
             <div className='mainBlock'>
               <img src={Robot} alt="robot" />
               <div className='edit'>
@@ -51,7 +51,7 @@ export default function Welcome({ currUser }) {
                     </>
                     :
                     <>
-                      <h1 className='username'>{currUser.username}</h1>
+                      <h1 className='username'>{currentUser.username}</h1>
                       <button className='editButton' onClick={() => setEditable(true)}><AiFillEdit /></button>
                     </>
                 }

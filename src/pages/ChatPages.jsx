@@ -2,75 +2,45 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { allUsersRoute , host } from '../utils/apiRoutes';
 import Contacts from '../components/Contacts';
 import Welcome from '../components/Welcome';
 import ChatContainer from '../components/ChatContainer';
-import {io} from 'socket.io-client';
 import PreLoader from '../components/PreLoader';
 
 function ChatPages() {
   const navigate = useNavigate();
-  const socket = useRef();
 
-  const [contacts, setContacts] = useState([]);
-  const [currentUser, setCurrentUser] = useState({username: 'Souvik'});
-  const [currentChat, setCurrentChat] = useState(undefined);
-  const [isLogged, setIsLogged] = useState(true);
-  const [preloader, setPreloader] = useState(false);
+  const [currentUser, setCurrentUser] = useState();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isLogged, setIsLogged] = useState(false);
 
-  useEffect(()=>{
-    async function getData(){
-      if(!localStorage.getItem("chat-app-user")){
-        // navigate('/login');
+  useEffect(() => {
+    const getData = async () => {
+      if (!localStorage.getItem("TechTalk-user")) {
+        navigate('/login');
       }
-      else{
+      else {
+        setCurrentUser(await JSON.parse(localStorage.getItem("TechTalk-user")));
         setIsLogged(true);
-        setCurrentUser(await JSON.parse(localStorage.getItem("chat-app-user")));
       }
     }
-  getData();
-  },[]);
+    getData();
+  }, []);
 
-  // socket connection establishment
-  // useEffect(()=>{
-  //   if(currentUser){
-  //     socket.current=io(host);
-  //     socket.current.emit('add-user',currentUser._id);
-  //   }
-  // },[currentUser]);
-
-  // useEffect(()=>{
-  //   // setPreloader(true);
-  //   async function fetchCurrentUser(){
-  //     if(currentUser){
-  //       const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-  //       setContacts(data.data);
-  //       // setPreloader(false);
-  //     }
-  //   }
-  // fetchCurrentUser();
-  // },[currentUser]);
-
-  const handleChatChange = (chat)=>{
-    setCurrentChat(chat);
-  }
-
-  return (<Container>
-    {
-      preloader? 
-      <PreLoader preloader={preloader}/>
-      :
-      <div className='container'>
-        <Contacts allcontacts={contacts} currUser={currentUser} changeChat={handleChatChange}/>
-        {
-          isLogged && currentChat === undefined ?
-          (<Welcome currUser={currentUser} />):
-          (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket}/>)
-        }
-      </div>
-    }
-  </Container>
+  return (
+    <Container>
+      {
+        currentUser &&
+        <div className='container'>
+          <Contacts currentUser={currentUser} selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
+          {
+            isLogged && selectedUser === null ?
+              (<Welcome currentUser={currentUser} />) :
+              (<ChatContainer selectedUser={selectedUser} currentUser={currentUser} />)
+          }
+        </div>
+      }
+    </Container>
   )
 }
 

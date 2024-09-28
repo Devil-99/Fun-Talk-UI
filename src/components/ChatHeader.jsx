@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import Logout from '../components/Logout';
 import {RiRadioButtonLine} from 'react-icons/ri';
 
-export default function ChatHeader({currentChat , isOnline}) {
+export default function ChatHeader({selectedUser , isOnline}) {
   return (
     <Container>
             <div className='user-details'>
-                <h1>{currentChat.username}</h1>
+                <h1>{selectedUser.username}</h1>
                 {isOnline? 
                   <div className='online'>
                     <RiRadioButtonLine/> 
