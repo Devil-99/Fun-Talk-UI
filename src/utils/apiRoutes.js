@@ -5,5 +5,5 @@ export const loginRoute = `${host}/api/login`;
 export const usersRoute = `${host}/api/users`;
 export const sendMessegeRoute = `${host}/api/message`;
 export const getMessagesRoute = `${host}/api/messages`;
-export const deleteMessegeRoutes = `${host}/api/messeges/deletemsg`;
+export const deleteMessegeRoutes = `${host}/api/deletemessege/`;
 export const renameRoute = `${host}/api/auth/updateUsername`;

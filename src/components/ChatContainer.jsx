@@ -9,13 +9,42 @@ import { MdDelete } from 'react-icons/md';
 import background from '../assets/black1.jpg';
 import PreLoader from './PreLoader';
 import { format } from 'timeago.js';
+import { io } from 'socket.io-client';
+import { host } from '../utils/apiRoutes';
 
 export default function ChatContainer({ selectedUser, currentUser }) {
     const [messeges, setMesseges] = useState([]);
-    const [arrivalMessege, setArrivalMessege] = useState(null);
     const [preloader, setPreloader] = useState(false);
     const [isonline, setIsonline] = useState(false);
     const scrollRef = useRef();
+    const socket = useRef();
+
+    useEffect(() => {
+        // Check if the socket is not already initialized
+        if (!socket.current) {
+            // Establish the socket connection with the server only once
+            socket.current = io(host);
+            console.log("Socket connected:", socket.current.id);
+
+            // Listen for incoming messages from the server
+            socket.current.on('message', (msg) => {
+                console.log(msg);
+                setMesseges((prev) => [...prev, msg]);
+            });
+
+            socket.current.on('deleted',()=>{
+                fetchData();
+            })
+        }
+
+        // Clean up function to disconnect socket when component unmounts
+        return () => {
+            if (socket.current) {
+                // socket.current.disconnect();
+                console.log("Socket disconnected");
+            }
+        };
+    }, []);
 
     async function fetchData() {
         const response = await axios.get(getMessagesRoute);
@@ -32,25 +61,28 @@ export default function ChatContainer({ selectedUser, currentUser }) {
     }, [selectedUser]);
 
     const handleSendMsg = async (msg) => {
+        // Push to Datbase
         const result = await axios.post(sendMessegeRoute, {
             from: currentUser.user_id,
             to: selectedUser.user_id,
             message: msg,
         });
-        setMesseges([...messeges, ...result.data]);
+        // Save in the message list for current user
+        // setMesseges([...messeges, ...result.data]);
+        // Sending through socket for opposite user
+        socket.current.emit('message', {
+            sender_id: currentUser.user_id,
+            receiver_id: selectedUser.user_id,
+            message: msg,
+        })
     };
 
     const deleteMsg = async (msg) => {
-        await axios.post(deleteMessegeRoutes, {
-            msgID: msg.messegeId
-        });
-        await fetchData();
+        const response = await axios.delete(`${deleteMessegeRoutes}?message_id=${msg.message_id}`);
+        if(response.status == 200){
+            socket.current.emit('delete');
+        }
     }
-
-    // This useEffect works when any msg received.
-    useEffect(() => {
-        arrivalMessege && setMesseges((prev) => [...prev, arrivalMessege]);
-    }, [arrivalMessege]);
 
     // this works when new msg send or recieved so that the page scroll down to the end.
     useEffect(() => {
@@ -79,7 +111,7 @@ export default function ChatContainer({ selectedUser, currentUser }) {
                                                                 {
                                                                     messege.receiver_id === currentUser.user_id ?
                                                                         <p></p> :
-                                                                        (<button className='delete' onClick={(event) => deleteMsg(messege)}><MdDelete /></button>)  
+                                                                        (<button className='delete' onClick={() => deleteMsg(messege)}><MdDelete /></button>)
                                                                 }
                                                             </div>
                                                             <i>{format(messege.timestamp)}</i>

@@ -1,17 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import {useNavigate} from 'react-router-dom';
-import {BiPowerOff} from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
+import { BiPowerOff } from 'react-icons/bi';
 
 export default function Logout() {
-    const navigate = useNavigate();
-    const handleClick = async ()=>{
-        localStorage.clear();
-        navigate('/login');
-    }
+  const navigate = useNavigate();
+
+  const handleClick = async () => {
+    localStorage.removeItem('TechTalk-user');
+    navigate('/login');
+  }
+
   return (
     <Button onClick={handleClick}>
-        <BiPowerOff/>
+      <BiPowerOff />
     </Button>
   )
 };
