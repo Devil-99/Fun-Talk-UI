@@ -5,7 +5,7 @@ import axios from 'axios';
 import { getMessagesRoute, sendMessegeRoute, deleteMessegeRoutes } from '../utils/apiRoutes';
 import { v4 as uuidv4 } from 'uuid';
 import ChatHeader from './ChatHeader';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdInfo } from 'react-icons/md';
 import background from '../assets/black1.jpg';
 import PreLoader from './PreLoader';
 import { format } from 'timeago.js';
@@ -32,7 +32,7 @@ export default function ChatContainer({ selectedUser, currentUser }) {
                 setMesseges((prev) => [...prev, msg]);
             });
 
-            socket.current.on('deleted',()=>{
+            socket.current.on('deleted', () => {
                 fetchData();
             })
         }
@@ -47,7 +47,12 @@ export default function ChatContainer({ selectedUser, currentUser }) {
     }, []);
 
     async function fetchData() {
-        const response = await axios.get(getMessagesRoute);
+        const response = await axios.get(getMessagesRoute, {
+            params: {
+                sender_id: currentUser.user_id,
+                receiver_id: selectedUser.user_id
+            }
+        });
         setMesseges(response.data);
         setPreloader(false);
     }
@@ -79,7 +84,7 @@ export default function ChatContainer({ selectedUser, currentUser }) {
 
     const deleteMsg = async (msg) => {
         const response = await axios.delete(`${deleteMessegeRoutes}?message_id=${msg.message_id}`);
-        if(response.status == 200){
+        if (response.status == 200) {
             socket.current.emit('delete');
         }
     }
@@ -105,17 +110,28 @@ export default function ChatContainer({ selectedUser, currentUser }) {
                                             return (
                                                 <div ref={scrollRef} key={uuidv4()}>
                                                     <div className={`messege ${messege.receiver_id === currentUser.user_id ? "recieved" : "sended"}`}>
-                                                        <div className='content'>
-                                                            <div className='msgfield'>
-                                                                <p>{messege.message}</p>
-                                                                {
-                                                                    messege.receiver_id === currentUser.user_id ?
-                                                                        <p></p> :
-                                                                        (<button className='delete' onClick={() => deleteMsg(messege)}><MdDelete /></button>)
-                                                                }
-                                                            </div>
-                                                            <i>{format(messege.timestamp)}</i>
-                                                        </div>
+                                                        {
+                                                            messege.receiver_id === currentUser.user_id ?
+                                                                <div className='content'>
+                                                                    <div className='msgfield'>
+                                                                        <p>{messege.message}</p>
+                                                                    </div>
+                                                                    <i className='time'>{format(messege.timestamp)}</i>
+                                                                    <button className='info'><MdInfo /></button>
+                                                                </div>
+                                                                :
+                                                                <div className='content'>
+                                                                    <div>
+                                                                        <button className='info'><MdInfo /></button>
+                                                                        <button className='delete' onClick={() => deleteMsg(messege)}><MdDelete /></button>
+                                                                    </div>
+                                                                    <div className='msgfield'>
+                                                                        <p>{messege.message}</p>
+                                                                    </div>
+                                                                    <i className='time'>{format(messege.timestamp)}</i>
+                                                                </div>
+
+                                                        }
                                                     </div>
                                                 </div>
                                             )
@@ -164,14 +180,16 @@ box-shadow: 10px 10px 20px #000000;
         align-items: center;
         .content{
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: end;
+            padding: 0.5rem;
+            gap: 1rem;
             max-width: 50%;
             overflow-wrap: break-word;
             border-radius: 1rem;
             color: #d1d1d1;
             i{
                 text-align:right;
-                margin-right:0.5rem;
                 font-size:0.5rem;
                 @media screen and (min-width: 250px) and (max-width: 800px){
                     font-size: 0.1rem;
@@ -181,22 +199,40 @@ box-shadow: 10px 10px 20px #000000;
                 display:flex;
                 flex-direction:row;
                 p{
-                    margin: 0.1rem;
+                    margin: 0;
                     texi-align:center;
                     @media screen and (min-width: 250px) and (max-width: 800px){
                         font-size: 0.8rem;
                     }
                 }
-                .delete{
-                    background:none;
-                    border:none;
-                    cursor: pointer;
-                    svg{
-                        margin:0;
-                        font-size: 1.5rem;
-                        @media screen and (min-width: 250px) and (max-width: 800px){
-                            font-size: 1rem;
-                        }
+            }
+            .delete{
+                cursor: pointer;
+                background-color: transparent;
+                margin: 0;
+                padding: 0;
+                border: none;
+                svg{
+                    margin:0;
+                    color: white;
+                    font-size: 1rem;
+                    @media screen and (min-width: 250px) and (max-width: 800px){
+                        font-size: 0.5rem;
+                    }
+                }
+            }
+            .info{
+                cursor: pointer;
+                background-color: transparent;
+                margin: 0;
+                padding: 0;
+                border: none;
+                svg{
+                    margin:0;
+                    color: white;
+                    font-size: 1rem;
+                    @media screen and (min-width: 250px) and (max-width: 800px){
+                        font-size: 0.5rem;
                     }
                 }
             }
@@ -205,7 +241,6 @@ box-shadow: 10px 10px 20px #000000;
     .sended{
         justify-content: flex-end;
         .content{
-            padding: 0.7rem 0 0.7rem 1rem;
             background-color: #56D2FE;
             color: white;
             background-image: linear-gradient(to left, #56D2FE, #202FFF);
@@ -217,7 +252,6 @@ box-shadow: 10px 10px 20px #000000;
     .recieved{
         justify-content: flex-start;
         .content{
-            padding: 0.7rem 0.8rem 0.7rem 0.8rem;
             background-color: #FF8FB3;
             background-image: linear-gradient(to left, #FF8FB3, #FAC8F4);
             color: black;

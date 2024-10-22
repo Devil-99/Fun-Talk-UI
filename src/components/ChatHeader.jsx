@@ -2,11 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import Logout from '../components/Logout';
 import {RiRadioButtonLine} from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 
 export default function ChatHeader({selectedUser , isOnline}) {
+  const navigate = useNavigate();
   return (
     <Container>
-            <div className='user-details'>
+            <div className='user-details' onClick={()=>navigate('/admin')}>
                 <h1>{selectedUser.username}</h1>
                 {isOnline? 
                   <div className='online'>
@@ -34,6 +36,7 @@ padding: 0 1rem;
   flex-direction:row;
   gap:0.5rem;
   height:50%;
+  cursor: pointer;
   @media screen and (min-width: 250px) and (max-width: 500px){
     h1{
       font-size: 1.8rem;

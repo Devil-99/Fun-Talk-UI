@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
-import { AiFillEdit } from 'react-icons/ai';
 import axios from 'axios';
 import { renameRoute } from '../utils/apiRoutes';
 import WelcomeFooter from './WelcomeFooter';
-import { TiTick } from "react-icons/ti";
+import AdminPage from '../pages/AdminPage';
 
 export default function Welcome({ currentUser }) {
   const navigate = useNavigate();
@@ -15,23 +14,7 @@ export default function Welcome({ currentUser }) {
   const handleRename = (e) => {
     setNewUsername(e.target.value);
   }
-  const [editable, setEditable] = useState(false);
-  const handleSave = async () => {
-    setEditable(false);
-    if (newUsername == null)
-      navigate('/');
-    else {
-      const { data } = await axios.post(renameRoute, { currentUser, newUsername });
-      if (data.status === false) {
-        console.error(data.msg);
-      }
-      if (data.status === true) {
-        localStorage.setItem('chat-app-user', JSON.stringify(data.user));
-        navigate('/');
-        window.location.reload(true);
-      }
-    }
-  }
+  const [setting, setSetting] = useState('');
 
   return (
     <>
@@ -39,26 +22,20 @@ export default function Welcome({ currentUser }) {
         currentUser && (
           <Container>
             <ChatHeader selectedUser={currentUser} isOnline={true} />
-            <div className='mainBlock'>
-              <img src={Robot} alt="robot" />
-              <div className='edit'>
-                <h1>Welcome</h1>
-                {
-                  editable ?
-                    <>
-                      <input className='renameInput' value={newUsername} onChange={handleRename} />
-                      <button className='editButton' onClick={() => handleSave()}><TiTick style={{ color: 'greenyellow' }} /></button>
-                    </>
-                    :
-                    <>
-                      <h1 className='username'>{currentUser.username}</h1>
-                      <button className='editButton' onClick={() => setEditable(true)}><AiFillEdit /></button>
-                    </>
-                }
-              </div>
-              <h3>Please select a chat to start messaging</h3>
-              <WelcomeFooter />
-            </div>
+            {
+              setting === 'admin' ?
+                <AdminPage user={currentUser} setSetting={setSetting}/>
+                :
+                <div className='mainBlock'>
+                  <img src={Robot} alt="robot" />
+                  <div className='edit'>
+                    <h1>Welcome</h1>
+                    <h1 className='username'>{currentUser.username}</h1>
+                  </div>
+                  <h3>Please select a chat to start messaging</h3>
+                  <WelcomeFooter setSetting={setSetting}/>
+                </div>
+            }
           </Container>
         )
       }
@@ -84,23 +61,11 @@ box-shadow: 10px 10px 20px #000000;
   .edit{
     display:flex;
     flex-direction:row;
-    gap:0.5rem;
     align-items:center;
     .username{
+      padding: 0;
+      margin: 0;
       color: #FF5605;
-    }
-    .editButton{
-      background-color:transparent;
-      padding:0;
-      margin:0;
-      height:50%;
-      border-radius:50%;
-      border:none;
-      cursor:pointer;
-      svg{
-        color:white;
-        font-size:1.5rem;
-      }
     }
   }
   h1{
