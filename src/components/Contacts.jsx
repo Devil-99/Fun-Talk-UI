@@ -4,14 +4,16 @@ import axios from 'axios';
 import { usersRoute } from '../utils/apiRoutes';
 import { ToastContainer, toast } from 'react-toastify';
 import { toastOptions } from '../utils/toastOptions';
+import { FaCircleUser } from "react-icons/fa6";
 
 export default function Contacts({ currentUser, selectedUser, setSelectedUser }) {
-    const [allusers, setAllusers] = useState([]); 
+    const [allusers, setAllusers] = useState([]);
 
     const fetchUsers = async () => {
         try {
             const response = await axios.get(usersRoute, { params: { user_id: currentUser.user_id } });
-            
+            console.log(response.data);
+
             if (response.status === 200)
                 setAllusers(response.data);
         } catch (error) {
@@ -30,7 +32,7 @@ export default function Contacts({ currentUser, selectedUser, setSelectedUser })
     useEffect(() => {
         if (currentUser)
             fetchUsers();
-    }, []); 
+    }, []);
 
     return (
         <Container>
@@ -46,6 +48,15 @@ export default function Contacts({ currentUser, selectedUser, setSelectedUser })
                                 onClick={() => setSelectedUser(user)}
                             >
                                 <div className='username'>
+                                    {
+                                        user.dp ?
+                                            <img
+                                                src={user.dp}
+                                                style={{ width: "1.5rem", height: "1.5rem", objectFit: "cover", borderRadius: "50%" }}
+                                            />
+                                            :
+                                            <FaCircleUser style={{ fontSize: '2rem', color: 'gray' }} />
+                                    }
                                     <h3>{user.username}</h3>
                                 </div>
                             </div>
@@ -116,7 +127,11 @@ border-radius: 3rem;
             border-radius: 0.5rem;
         }
         .username{
-            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
             margin-left: 1rem;
             h3{
                 font-size: 0.9rem;
