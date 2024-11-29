@@ -2,6 +2,7 @@
 export const host = "http://localhost:5000";
 export const registerRoute = `${host}/api/register`;
 export const loginRoute = `${host}/api/login`;
+export const uploadDPRoute = `${host}/api/dp`;
 export const usersRoute = `${host}/api/users`;
 export const sendMessegeRoute = `${host}/api/message`;
 export const getMessagesRoute = `${host}/api/messages`;
