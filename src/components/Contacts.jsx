@@ -13,8 +13,7 @@ export default function Contacts({ currentUser, selectedUser, setSelectedUser })
     const fetchUsers = async () => {
         try {
             const response = await axios.get(usersRoute, { params: { user_id: currentUser.user_id } });
-            console.log(response.data);
-
+           
             if (response.status === 200)
                 setAllusers(response.data);
         } catch (error) {
@@ -136,6 +135,7 @@ const Container = styled.div`
         gap: 1rem;
 
         h3 {
+          margin: 0;
           font-size: 1rem;
           color: white;
         }

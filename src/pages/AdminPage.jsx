@@ -28,7 +28,7 @@ function AdminPage({ user, setSetting }) {
           };
           const compressedFile = await imageCompression(file, options);
           setImage(compressedFile);
-  
+
           // Create a preview URL
           const previewUrl = URL.createObjectURL(compressedFile);
           setPreview(previewUrl);
@@ -99,15 +99,15 @@ function AdminPage({ user, setSetting }) {
                       alt="Selected Preview"
                       style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }}
                     />
-                    <button style={{ padding: "5px 10px", cursor: "pointer" }} onClick={handleDPUpload}>
+                    <button style={{ padding: "0.5rem 1rem", border: 'none', borderRadius: '0.5rem', cursor: "pointer", backgroundColor: '#28a745', color: '#fff'}} onClick={handleDPUpload}>
                       Upload
                     </button>
-                    <button style={{ padding: "5px 10px", cursor: "pointer" }} onClick={handleCancelDP}>
+                    <button style={{ padding: "0.5rem 1rem", border: 'none', borderRadius: '0.5rem', cursor: "pointer", backgroundColor: '#dc3545', color: '#fff' }} onClick={handleCancelDP}>
                       X
                     </button>
                   </div>
                 ) :
-                <div style={{ display: 'flex', width: '100%', gap: '1rem', flexDirection: 'column', alignItems: 'center' }}>
+                <div className='image-upload'>
                   {
                     user.dp ?
                       <img
@@ -168,18 +168,25 @@ const Container = styled.div`
 display: flex;
 justify-content: center;
 align-items: center;
+
 .body{
   width: 50%;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
   .header{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    box-shadow: 1px 1px 3px gray, -2px -2px 4px black;    
-    padding: 0.5rem;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
   }
+
   .mainbody{
     display: flex;
     flex-direction: column;
@@ -187,20 +194,39 @@ align-items: center;
     padding: 1rem;
     gap: 0.5rem;
 
+    .image-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      input[type="file"] {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+    }
+
     .fields{
       display: flex;
       width: 100%;
       flex-direction: row;
-      justify-content: center;
-      padding: 1rem 0;
+      justify-content: space-between;
+      padding: 1rem;
       gap: 1rem;
       align-items: center;
       border-bottom: 1px solid gray;
+
       h2{
         margin: 0;
+        font-size: 1.2rem;
+        color: #666;
       }
       h3{
-        margin: 0
+        margin: 0;
+        font-size: 1rem;
+        color: #fff;
       }
     }
   }

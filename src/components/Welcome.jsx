@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
@@ -9,7 +8,6 @@ import WelcomeFooter from './WelcomeFooter';
 import AdminPage from '../pages/AdminPage';
 
 export default function Welcome({ currentUser }) {
-  const navigate = useNavigate();
   const [newUsername, setNewUsername] = useState(currentUser.username);
   const handleRename = (e) => {
     setNewUsername(e.target.value);

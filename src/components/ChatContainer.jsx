@@ -5,15 +5,16 @@ import axios from 'axios';
 import { getMessagesRoute, sendMessegeRoute, deleteMessegeRoutes } from '../utils/apiRoutes';
 import { v4 as uuidv4 } from 'uuid';
 import ChatHeader from './ChatHeader';
-import { MdDelete, MdInfo } from 'react-icons/md';
 import background from '../assets/black1.jpg';
 import PreLoader from './PreLoader';
 import { format } from 'timeago.js';
 import { io } from 'socket.io-client';
 import { host } from '../utils/apiRoutes';
+import Message from './Message';
 
 export default function ChatContainer({ selectedUser, currentUser }) {
     const [messeges, setMesseges] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [preloader, setPreloader] = useState(false);
     const [isonline, setIsonline] = useState(false);
     const scrollRef = useRef();
@@ -46,17 +47,6 @@ export default function ChatContainer({ selectedUser, currentUser }) {
         };
     }, []);
 
-    async function fetchData() {
-        const response = await axios.get(getMessagesRoute, {
-            params: {
-                sender_id: currentUser.user_id,
-                receiver_id: selectedUser.user_id
-            }
-        });
-        setMesseges(response.data);
-        setPreloader(false);
-    }
-
     // this render the page whenever a chat is selected
     useEffect(() => {
         if (selectedUser) {
@@ -64,25 +54,42 @@ export default function ChatContainer({ selectedUser, currentUser }) {
             fetchData();
         }
     }, [selectedUser]);
+    
+    async function fetchData() {
+        try {
+            const response = await axios.get(getMessagesRoute, {
+              params: {
+                sender_id: currentUser.user_id,
+                receiver_id: selectedUser.user_id,
+              },
+            });
+            setMesseges(response.data);
+          } catch (error) {
+            console.error("Error fetching messages:", error);
+          } finally {
+            setIsLoading(false);
+          }
+    }
 
     const handleSendMsg = async (msg) => {
-        // Push to Datbase
-        const result = await axios.post(sendMessegeRoute, {
-            from: currentUser.user_id,
-            to: selectedUser.user_id,
-            message: msg,
-        });
-        // Save in the message list for current user
-        // setMesseges([...messeges, ...result.data]);
-        // Sending through socket for opposite user
-        socket.current.emit('message', {
-            sender_id: currentUser.user_id,
-            receiver_id: selectedUser.user_id,
-            message: msg,
-        })
+        try {
+            await axios.post(sendMessegeRoute, {
+              from: currentUser.user_id,
+              to: selectedUser.user_id,
+              message: msg,
+            });
+      
+            socket.current.emit('message', {
+              sender_id: currentUser.user_id,
+              receiver_id: selectedUser.user_id,
+              message: msg,
+            });
+          } catch (error) {
+            console.error("Error sending message:", error);
+          }
     };
 
-    const deleteMsg = async (msg) => {
+    const handleDeleteMsg = async (msg) => {
         const response = await axios.delete(`${deleteMessegeRoutes}?message_id=${msg.message_id}`);
         if (response.status == 200) {
             socket.current.emit('delete');
@@ -96,169 +103,57 @@ export default function ChatContainer({ selectedUser, currentUser }) {
 
     return (
         <>
-            {
-                selectedUser && (
-                    <Container>
-                        <ChatHeader selectedUser={selectedUser} isOnline={isonline} />
-                        {
-                            preloader ?
-                                <PreLoader preloader={preloader} />
-                                :
-                                <div className='chat-messeges' >
-                                    {
-                                        messeges.map((messege) => {
-                                            return (
-                                                <div ref={scrollRef} key={uuidv4()}>
-                                                    <div className={`messege ${messege.receiver_id === currentUser.user_id ? "recieved" : "sended"}`}>
-                                                        {
-                                                            messege.receiver_id === currentUser.user_id ?
-                                                                <div className='content'>
-                                                                    <div className='msgfield'>
-                                                                        <p>{messege.message}</p>
-                                                                    </div>
-                                                                    <i className='time'>{format(messege.timestamp)}</i>
-                                                                    <button className='info'><MdInfo /></button>
-                                                                </div>
-                                                                :
-                                                                <div className='content'>
-                                                                    <div>
-                                                                        <button className='info'><MdInfo /></button>
-                                                                        <button className='delete' onClick={() => deleteMsg(messege)}><MdDelete /></button>
-                                                                    </div>
-                                                                    <div className='msgfield'>
-                                                                        <p>{messege.message}</p>
-                                                                    </div>
-                                                                    <i className='time'>{format(messege.timestamp)}</i>
-                                                                </div>
-
-                                                        }
-                                                    </div>
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
-                        }
-                        <ChatInput handleSendMsg={handleSendMsg} />
-                    </Container>
-                )
-            }
-        </>
+      {selectedUser && (
+        <Container>
+          <ChatHeader selectedUser={selectedUser} isOnline={isonline} />
+          {isLoading ? (
+            <PreLoader isLoading={isLoading} />
+          ) : (
+            <div className="chat-messages">
+              {messeges.map((message) => (
+                <Message
+                  key={message.message_id}
+                  message={message}
+                  isCurrentUser={message.receiver_id !== currentUser.user_id}
+                  onDelete={handleDeleteMsg}
+                />
+              ))}
+              <div ref={scrollRef} />
+            </div>
+          )}
+          <ChatInput handleSendMsg={handleSendMsg} />
+        </Container>
+      )}
+    </>
     )
 }
 
 const Container = styled.div`
-display: grid;
-grid-template-rows: 10% 80% 10%;
-overflow: hidden;
-border-radius: 1rem;
-box-shadow: 10px 10px 20px #000000;
-@media screen and (min-width: 250px) and (max-width: 800px){
+  display: grid;
+  grid-template-rows: 10% 80% 10%;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 10px 10px 20px #000000;
+
+  @media screen and (min-width: 250px) and (max-width: 800px) {
     grid-template-rows: 8% 85% 7%;
     box-shadow: 0px 0px;
-}
-.chat-messeges{
+  }
+
+  .chat-messages {
     padding: 1rem 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     overflow: auto;
     background: url(${background});
-    &::-webkit-scrollbar{
-        width: 0.2rem;
-        &-thumb{
-            background-color: #ffffff39;
-            width: 0.1rem;
-            border-radius: 1rem;
-        }
+    &::-webkit-scrollbar {
+      width: 0.2rem;
+      &-thumb {
+        background-color: #ffffff39;
+        width: 0.1rem;
+        border-radius: 1rem;
+      }
     }
-    @media screen and (min-width: 250px) and (max-width: 800px){
-        padding: 1rem 1rem;
-    }
-    .messege{
-        display: flex;
-        align-items: center;
-        .content{
-            display: flex;
-            flex-direction: row;
-            align-items: end;
-            padding: 0.5rem;
-            gap: 1rem;
-            max-width: 50%;
-            overflow-wrap: break-word;
-            border-radius: 1rem;
-            color: #d1d1d1;
-            i{
-                text-align:right;
-                font-size:0.5rem;
-                @media screen and (min-width: 250px) and (max-width: 800px){
-                    font-size: 0.1rem;
-                }
-            }
-            .msgfield{
-                display:flex;
-                flex-direction:row;
-                p{
-                    margin: 0;
-                    texi-align:center;
-                    @media screen and (min-width: 250px) and (max-width: 800px){
-                        font-size: 0.8rem;
-                    }
-                }
-            }
-            .delete{
-                cursor: pointer;
-                background-color: transparent;
-                margin: 0;
-                padding: 0;
-                border: none;
-                svg{
-                    margin:0;
-                    color: white;
-                    font-size: 1rem;
-                    @media screen and (min-width: 250px) and (max-width: 800px){
-                        font-size: 0.5rem;
-                    }
-                }
-            }
-            .info{
-                cursor: pointer;
-                background-color: transparent;
-                margin: 0;
-                padding: 0;
-                border: none;
-                svg{
-                    margin:0;
-                    color: white;
-                    font-size: 1rem;
-                    @media screen and (min-width: 250px) and (max-width: 800px){
-                        font-size: 0.5rem;
-                    }
-                }
-            }
-        }
-    }
-    .sended{
-        justify-content: flex-end;
-        .content{
-            background-color: #56D2FE;
-            color: white;
-            background-image: linear-gradient(to left, #56D2FE, #202FFF);
-            @media screen and (min-width: 250px) and (max-width: 800px){
-                padding: 0.5rem 0 0.5rem 0.5rem;
-            }
-        }
-    }
-    .recieved{
-        justify-content: flex-start;
-        .content{
-            background-color: #FF8FB3;
-            background-image: linear-gradient(to left, #FF8FB3, #FAC8F4);
-            color: black;
-            @media screen and (min-width: 250px) and (max-width: 800px){
-                padding: 0.5rem;
-            }
-        }
-    }
-}
+  }
 `;
