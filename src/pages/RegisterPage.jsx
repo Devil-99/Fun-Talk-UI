@@ -13,7 +13,8 @@ function RegisterPage() {
         username: "",
         email: "",
         password: "",
-        confirmPassword: ""
+        confirmPassword: "",
+        city: ""
     });
 
     const handleSubmit = async (event) => {
@@ -112,6 +113,7 @@ function RegisterPage() {
                     <input type="email" placeholder='Email' name='email' value={values.email} onChange={(e) => handleChange(e)} />
                     <input type="password" placeholder='Password' name='password' value={values.password} onChange={(e) => handleChange(e)} />
                     <input type="password" placeholder='Confirm Password' name='confirmPassword' value={values.confirmPassword} onChange={(e) => handleChange(e)} />
+                    <input type="text" placeholder='City' name="city" value={values.city} onChange={(e)=> handleChange(e)} />
                     <button type='submit' onClick={handleSubmit}>Create User</button>
                     <span>Already have an account ? <Link to="/login">Login</Link></span>
                 </form>

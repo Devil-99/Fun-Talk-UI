@@ -134,7 +134,7 @@ const Container = styled.div`
   overflow: hidden;
   border-radius: 1rem;
   box-shadow: 10px 10px 20px #000000;
-
+  background-color: #252525;
   @media screen and (min-width: 250px) and (max-width: 800px) {
     grid-template-rows: 8% 85% 7%;
     box-shadow: 0px 0px;

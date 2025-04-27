@@ -8,67 +8,67 @@ import { FaCircleUser } from "react-icons/fa6";
 import FunTalk from '../assets/FunTalk.png'
 
 export default function Contacts({ currentUser, selectedUser, setSelectedUser }) {
-    const [allusers, setAllusers] = useState([]);
+  const [allusers, setAllusers] = useState([]);
 
-    const fetchUsers = async () => {
-        try {
-            const response = await axios.get(usersRoute, { params: { user_id: currentUser.user_id } });
-           
-            if (response.status === 200)
-                setAllusers(response.data);
-        } catch (error) {
-            console.log(error);
-            if (error.response) {
-                const { status, data } = error.response;
-                toast.error(data.message, toastOptions);
-            } else if (error.request) {
-                toast.error('Network error. Please check your connection.', toastOptions);
-            } else {
-                toast.error('An unexpected error occurred. Please try again.', toastOptions);
-            }
-        }
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(usersRoute, { params: { user_id: currentUser.user_id } });
+
+      if (response.status === 200)
+        setAllusers(response.data);
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        const { status, data } = error.response;
+        toast.error(data.message, toastOptions);
+      } else if (error.request) {
+        toast.error('Network error. Please check your connection.', toastOptions);
+      } else {
+        toast.error('An unexpected error occurred. Please try again.', toastOptions);
+      }
     }
+  }
 
-    useEffect(() => {
-        if (currentUser)
-            fetchUsers();
-    }, []);
+  useEffect(() => {
+    if (currentUser)
+      fetchUsers();
+  }, []);
 
-    return (
-        <Container>
-            <div className='contacts'>
-                {
-                    allusers.map((user, index) => {
-                        return (
-                            <div className={`contact ${selectedUser && user.user_id === selectedUser.user_id ? "selected" : ""}`}
-                                key={index}
-                                onClick={() => setSelectedUser(user)}
-                            >
-                                <div className='username'>
-                                    {
-                                        user.dp ?
-                                            <img
-                                                src={user.dp}
-                                                style={{ width: "1.5rem", height: "1.5rem", objectFit: "cover", borderRadius: "50%" }}
-                                            />
-                                            :
-                                            <FaCircleUser style={{ fontSize: '2rem', color: 'gray' }} />
-                                    }
-                                    <h3>{user.username}</h3>
-                                </div>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-            <div className='current-user'>
-                <div className='username' onClick={() => setSelectedUser(null)}>
-                    <h2 title="Go to Home">{"Home"}</h2>
+  return (
+    <Container>
+      <div className='contacts'>
+        {
+          allusers.map((user, index) => {
+            return (
+              <div className={`contact ${selectedUser && user.user_id === selectedUser.user_id ? "selected" : ""}`}
+                key={index}
+                onClick={() => setSelectedUser(user)}
+              >
+                <div className='username'>
+                  {
+                    user.dp ?
+                      <img
+                        src={user.dp}
+                        style={{ width: "1.5rem", height: "1.5rem", objectFit: "cover", borderRadius: "50%" }}
+                      />
+                      :
+                      <FaCircleUser style={{ fontSize: '2rem', color: 'gray' }} />
+                  }
+                  <h3>{user.username}</h3>
                 </div>
-            </div>
-            <ToastContainer />
-        </Container>
-    )
+              </div>
+            )
+          })
+        }
+      </div>
+      <div className='current-user'>
+        <div className='username' onClick={() => setSelectedUser(null)}>
+          <h2 title="Go to Home">{"Home"}</h2>
+        </div>
+      </div>
+      <ToastContainer />
+    </Container>
+  )
 }
 
 const Container = styled.div`
@@ -78,7 +78,7 @@ const Container = styled.div`
   overflow: hidden;
   background: url(${FunTalk}) no-repeat center center;
   background-size: 80%;
-  background-color: #00000060;
+    background-color: #252525;
   box-shadow: -5px -5px 12px #3a3a3a, 5px 5px 12px #000000;
   border-radius: 3rem;
   padding: 1rem;
@@ -97,7 +97,6 @@ const Container = styled.div`
     padding: 1rem 0;
     overflow-y: auto;
     gap: 0.5rem;
-
     &::-webkit-scrollbar {
       width: 0.2rem;
     }

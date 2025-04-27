@@ -48,7 +48,7 @@ grid-template-rows: 10% 80% 10%;
 color: white;
 overflow: hidden;
 border-radius: 1rem;
-background-color: #00000060;
+background-color: #252525;
 box-shadow: 10px 10px 20px #000000;
 .mainBlock{
   margin-top:1rem;
