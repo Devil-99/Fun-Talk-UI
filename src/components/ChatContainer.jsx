@@ -105,7 +105,7 @@ export default function ChatContainer({ selectedUser, currentUser }) {
         <>
       {selectedUser && (
         <Container>
-          <ChatHeader selectedUser={selectedUser} isOnline={isonline} />
+          <ChatHeader user={selectedUser} isOnline={isonline} />
           {isLoading ? (
             <PreLoader isLoading={isLoading} />
           ) : (

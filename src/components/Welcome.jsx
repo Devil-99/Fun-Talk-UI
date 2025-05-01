@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
-import axios from 'axios';
-import { renameRoute } from '../utils/apiRoutes';
 import WelcomeFooter from './WelcomeFooter';
 import AdminPage from '../pages/AdminPage';
+import { useSelector } from 'react-redux';
 
-export default function Welcome({ currentUser }) {
-  const [newUsername, setNewUsername] = useState(currentUser.username);
-  const handleRename = (e) => {
-    setNewUsername(e.target.value);
-  }
+export default function Welcome({currentUser}) {
+  console.log(currentUser);
+  
   const [setting, setSetting] = useState('');
 
   return (
@@ -19,7 +16,7 @@ export default function Welcome({ currentUser }) {
       {
         currentUser && (
           <Container>
-            <ChatHeader selectedUser={currentUser} isOnline={true} />
+            <ChatHeader user={currentUser} isOnline={true} />
             {
               setting === 'admin' ?
                 <AdminPage user={currentUser} setSetting={setSetting}/>

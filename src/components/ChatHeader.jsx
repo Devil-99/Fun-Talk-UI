@@ -5,21 +5,21 @@ import { RiRadioButtonLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { FaCircleUser } from "react-icons/fa6";
 
-export default function ChatHeader({ selectedUser, isOnline }) {
+export default function ChatHeader({ user, isOnline }) {
   const navigate = useNavigate();
   return (
     <Container>
       <div className='user-details' onClick={() => navigate('/admin')}>
         {
-          selectedUser.dp ?
+          user.dp ?
             <img
-              src={selectedUser.dp}
+              src={user.dp}
               style={{ width: "2rem", height: "2rem", objectFit: "cover", borderRadius: "50%" }}
             />
             :
             <FaCircleUser style={{ fontSize: '2rem', color: 'gray' }} />
         }
-        <h1>{selectedUser.username}</h1>
+        <h1>{user.username}</h1>
         {isOnline ?
           <div className='online'>
             <RiRadioButtonLine />
@@ -36,9 +36,9 @@ export default function ChatHeader({ selectedUser, isOnline }) {
 };
 
 const Container = styled.div`
-background-color: #00000060;
 display: flex;
 justify-content: space-between;
+background-color: #00000060;
 align-items: center;
 padding: 0 1rem;
 .user-details{

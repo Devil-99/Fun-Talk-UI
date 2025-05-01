@@ -6,10 +6,13 @@ import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. W
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
 import {toastOptions} from '../utils/toastOptions';
+import { useDispatch } from 'react-redux';
+import { login } from '../redux/slices/loginSlice';
 
 function LoginPage() {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [values, setValues] = useState({
         mail: "",
         password: ""
@@ -22,6 +25,7 @@ function LoginPage() {
                 const response = await axios.post(loginRoute, values);
                 if (response.status === 200) {
                     localStorage.setItem('TechTalk-user', JSON.stringify(response.data));
+                    dispatch(login(response.data));
                     navigate('/');
                 }
             } catch (error) {
