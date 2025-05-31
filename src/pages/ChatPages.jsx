@@ -1,57 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import Contacts from '../components/Contacts';
-import Welcome from '../components/Welcome';
-import ChatContainer from '../components/ChatContainer';
 import { useSelector } from 'react-redux';
-import ChatHeader from '../components/ChatHeader';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/slices/loginSlice';
+// Lazy loading components to optimize performance
+const Contacts = lazy(() => import('../components/Contacts'));
+const Welcome = lazy(() => import('../components/Welcome'));
+const ChatContainer = lazy(() => import('../components/ChatContainer'));
 
 function ChatPages() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const getData = async () => {
-      const savedUser = await JSON.parse(localStorage.getItem("TechTalk-user"));
-      if (savedUser) {
-        setCurrentUser(savedUser);
-        dispatch(login(savedUser));
-        setLoading(false);
-      } else {
-        navigate('/login');
-      }
-    }
-    getData();
-  }, []);
-
+  const currentUser = useSelector((state) => state.login.user);
   const [selectedUser, setSelectedUser] = useState(null);
 
   return (
-    <Container
-      style={{
-        height: '100vh',
-        width: '100vw',
-      }}
-    >
-      {
-        loading || currentUser === null ? (
-          <div className='loading'>
-            <h1>Loading...</h1>
-          </div>
-        ) :
-          (<div className='container'>
-            <Contacts currentUser={currentUser} selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
-            {
-              selectedUser === null ?
-                <Welcome currentUser={currentUser}/> :
-                <ChatContainer selectedUser={selectedUser} currentUser={currentUser} />
-            }
-          </div>)
-      }
+    <Container>
+      <div className='container'>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Contacts selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
+        </Suspense>
+        {
+          !selectedUser ?
+            <Welcome currentUser={currentUser} /> :
+            <Suspense fallback={<div>Loading...</div>}>
+              <ChatContainer selectedUser={selectedUser}/>
+            </Suspense>
+        }
+      </div>
     </Container>
   )
 }
@@ -65,8 +37,8 @@ justify-content: center;
 align-items: center;
 gap: 1rem;
 .container{
-  height: 85vh;
-  width: 85vw;
+  height: 90vh;
+  width: 90vw;
   @media screen and (min-width: 250px) and (max-width: 800px){
     padding-top: 2rem;
     height: 90vh;

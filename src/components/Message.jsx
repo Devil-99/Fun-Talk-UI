@@ -38,8 +38,8 @@ const MessageContainer = styled.div`
     padding: 0.5rem;
     max-width: 50%;
     border-radius: 1rem;
-    background-color: ${(props) => (props.isCurrentUser ? '#56D2FE' : '#FF8FB3')};
-    color: ${(props) => (props.isCurrentUser ? 'white' : 'black')};
+    background-color: rgb(63, 63, 63);
+    color: ${(props) => (props.isCurrentUser ? 'white' : 'rgb(248, 113, 55)')};
     overflow-wrap: break-word;
 
     .actions {

@@ -1,11 +1,10 @@
-import React from 'react';
 import styled from 'styled-components';
 import Logout from '../components/Logout';
-import { RiRadioButtonLine } from 'react-icons/ri';
+import { RiRadioButtonLine } from "react-icons/ri";
+import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { FaCircleUser } from "react-icons/fa6";
 
-export default function ChatHeader({ user, isOnline }) {
+export default function ChatHeader({ user }) {
   const navigate = useNavigate();
   return (
     <Container>
@@ -17,18 +16,10 @@ export default function ChatHeader({ user, isOnline }) {
               style={{ width: "2rem", height: "2rem", objectFit: "cover", borderRadius: "50%" }}
             />
             :
-            <FaCircleUser style={{ fontSize: '2rem', color: 'gray' }} />
+            <FaUserCircle style={{ fontSize: '2.5rem', color: 'gray' }} />
         }
         <h1>{user.username}</h1>
-        {isOnline ?
-          <div className='online'>
-            <RiRadioButtonLine />
-          </div>
-          :
-          <div className='offline'>
-            <RiRadioButtonLine />
-          </div>
-        }
+        <RiRadioButtonLine style={ user.online? { color: '#AAFF00' } : { color: 'gray' } } />
       </div>
       <Logout />
     </Container>
@@ -55,16 +46,6 @@ padding: 0 1rem;
     h1{
         margin:0;
         color: white;
-    }
-    .online{
-      svg{
-        color:#AAFF00;
-      }
-    }
-    .offline{
-      svg{
-        color:gray;
-      }
     }
 }
 `;

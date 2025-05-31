@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { IoArrowBackCircle } from "react-icons/io5";
 import { MdEdit } from "react-icons/md";
-import { FaCircleUser } from "react-icons/fa6";
 import axios from 'axios';
 import { uploadDPRoute } from '../utils/apiRoutes';
 import { ToastContainer, toast } from 'react-toastify';
@@ -115,7 +114,7 @@ function AdminPage({ user, setSetting }) {
                         style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }}
                       />
                       :
-                      <FaCircleUser style={{ fontSize: '8rem', color: 'gray' }} />
+                      <>User</>
                   }
                   <input
                     type="file"

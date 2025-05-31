@@ -1,18 +1,19 @@
-import { React, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
-import {toastOptions} from '../utils/toastOptions';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/slices/loginSlice';
+import { toastOptions } from '../utils/toastOptions';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginLoading, loginSuccess } from '../redux/slices/loginSlice';
+import { getSocket } from '../redux/slices/socketSlice';
 
 function LoginPage() {
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const connected = useSelector((state) => state.socket.connected);
     const [values, setValues] = useState({
         mail: "",
         password: ""
@@ -22,10 +23,14 @@ function LoginPage() {
         event.preventDefault();  // Prevents page refresh
         if (handleValidation()) {
             try {
+                dispatch(loginLoading());
                 const response = await axios.post(loginRoute, values);
                 if (response.status === 200) {
-                    localStorage.setItem('TechTalk-user', JSON.stringify(response.data));
-                    dispatch(login(response.data));
+                    if (connected) {
+                        const socket = getSocket();
+                        socket.emit('login', response.data);
+                    }
+                    dispatch(loginSuccess(response.data));
                     navigate('/');
                 }
             } catch (error) {

@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Robot from '../assets/robot.gif';
 import styled from 'styled-components';
 import ChatHeader from './ChatHeader';
 import WelcomeFooter from './WelcomeFooter';
 import AdminPage from '../pages/AdminPage';
-import { useSelector } from 'react-redux';
 
 export default function Welcome({currentUser}) {
-  console.log(currentUser);
-  
   const [setting, setSetting] = useState('');
 
   return (

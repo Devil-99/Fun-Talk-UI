@@ -1,14 +1,42 @@
-import React from 'react';
 import styled from 'styled-components';
+import { logoutRoute } from '../utils/apiRoutes';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { toastOptions } from '../utils/toastOptions';
 import { BiPowerOff } from 'react-icons/bi';
+import { getSocket } from '../redux/slices/socketSlice';
 
 export default function Logout() {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.login.user);
+  const connected = useSelector((state) => state.socket.connected);
 
   const handleClick = async () => {
-    localStorage.removeItem('TechTalk-user');
-    navigate('/login');
+    try {
+      const response = await axios.post(logoutRoute, { userId: user.user_id });
+      if (response.status === 200) {
+        if(connected){
+          const socket = getSocket();
+          socket.emit('logout', user);
+        }
+        localStorage.removeItem('TechTalk-user');
+        navigate('/login');
+      }
+    } catch (error) {
+      if (error.response) {
+        // Errors returned from the server (4xx, 5xx responses)
+        const { status, data } = error.response;
+        toast.error(data.message, toastOptions);
+      } else if (error.request) {
+        // No response from server (network issue)
+        toast.error('Network error. Please check your connection.', toastOptions);
+      } else {
+        // Other errors (coding issues, etc.)
+        toast.error('An unexpected error occurred. Please try again.', toastOptions);
+      }
+    }
   }
 
   return (

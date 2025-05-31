@@ -7,9 +7,14 @@ export const loginSlice = createSlice({
         user: null,
     },
     reducers: {
-        login: (state, action) => {
+        loginLoading: (state) => {
+            state.loading = true;
+        },
+        loginSuccess: (state, action) => {
             state.loading = false;
             state.user = action.payload;
+
+            localStorage.setItem('TechTalk-user', JSON.stringify(action.payload));
         },
         logout: (state) => {
             state.isLogged = false;
@@ -18,5 +23,5 @@ export const loginSlice = createSlice({
     },
 });
 
-export const { login, logout } = loginSlice.actions;
+export const { loginLoading, loginSuccess, logout } = loginSlice.actions;
 export default loginSlice.reducer;
