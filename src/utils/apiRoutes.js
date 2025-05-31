@@ -1,5 +1,6 @@
-// export const host = "https://funtalkserver.onrender.com";
-export const host = "http://localhost:5000";
+export const host = process.env.HOST === 'development'?
+ "http://localhost:5000" : "https://funtalkserver.onrender.com";
+
 export const registerRoute = `${host}/api/register`;
 export const loginRoute = `${host}/api/login`;
 export const logoutRoute = `${host}/api/logout`;
