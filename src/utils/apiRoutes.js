@@ -1,4 +1,4 @@
-export const host = process.env.HOST === 'development'?
+export const host = process.env.NODE_ENV === 'development'?
  "http://localhost:5000" : "https://funtalkserver.onrender.com";
 
 export const registerRoute = `${host}/api/register`;
