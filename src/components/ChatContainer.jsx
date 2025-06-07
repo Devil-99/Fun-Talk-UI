@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
 import styled from 'styled-components';
 import ChatInput from '../components/ChatInput';
 import axios from 'axios';
@@ -8,25 +9,24 @@ import {
   sendMessegeRoute,
   deleteMessegeRoutes,
 } from '../utils/apiRoutes';
-import ChatHeader from './ChatHeader';
 import background from '../assets/black1.jpg';
 import PreLoader from './PreLoader';
 import Message from './Message';
 import { getSocket } from '../redux/slices/socketSlice';
+import { toastOptions } from '../utils/toastOptions';
 
 export default function ChatContainer({ selectedUser }) {
   const currentUser = useSelector((state) => state.login.user);
   const connected = useSelector((state) => state.socket.connected);
   const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [preloader, setPreloader] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
+  const [fetchMsgLoader, setFetchMsgLoader] = useState(false);
+  const [sendLoader, setSendLoader] = useState(false);
   const scrollRef = useRef();
 
   // Fetch chat messages
   const fetchData = async () => {
     try {
-      setIsLoading(true);
+      setFetchMsgLoader(true);
       const response = await axios.get(getMessagesRoute, {
         params: {
           sender_id: currentUser.user_id,
@@ -37,14 +37,13 @@ export default function ChatContainer({ selectedUser }) {
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
-      setIsLoading(false);
+      setFetchMsgLoader(false);
     }
   };
 
   // Fetch messages when selectedUser changes
   useEffect(() => {
     if (selectedUser) {
-      setPreloader(true);
       fetchData();
     }
   }, [selectedUser]);
@@ -56,7 +55,6 @@ export default function ChatContainer({ selectedUser }) {
     const socket = getSocket();
 
     const handleIncomingMessage = (msg) => {
-      // Check if the message is from/to the selected user
       const isRelevant =
         (msg.sender_id === currentUser.user_id && msg.receiver_id === selectedUser.user_id) ||
         (msg.sender_id === selectedUser.user_id && msg.receiver_id === currentUser.user_id);
@@ -66,8 +64,24 @@ export default function ChatContainer({ selectedUser }) {
       }
     };
 
-    const handleDeletedMessage = () => {
-      fetchData();
+    const handleDeletedMessage = (msg) => {
+      const isRelevantSender =
+        (msg.sender_id === currentUser.user_id && msg.receiver_id === selectedUser.user_id) || false;
+      const isRelevantReciever =
+        (msg.sender_id === selectedUser.user_id && msg.receiver_id === currentUser.user_id) || false;
+
+      if (isRelevantReciever) {
+        setMessages((prev) => 
+          prev.map(message =>
+            message.message_id === msg.message_id ?
+              { ...message, message: 'Message deleted' }
+              : message
+          )
+        );        
+      }
+      if(isRelevantSender){
+        setMessages((prev) => prev.filter((message) => message.message_id !== msg.message_id));
+      }
     };
 
     socket.on('message', handleIncomingMessage);
@@ -87,6 +101,7 @@ export default function ChatContainer({ selectedUser }) {
   // Send a new message
   const handleSendMsg = async (msg) => {
     try {
+      setSendLoader(true)
       await axios.post(sendMessegeRoute, {
         from: currentUser.user_id,
         to: selectedUser.user_id,
@@ -99,7 +114,11 @@ export default function ChatContainer({ selectedUser }) {
         message: msg,
       });
     } catch (error) {
+      toast.error("Error sending message !", toastOptions);
       console.error("Error sending message:", error);
+    }
+    finally {
+      setSendLoader(false);
     }
   };
 
@@ -111,20 +130,21 @@ export default function ChatContainer({ selectedUser }) {
       );
 
       if (response.status === 200) {
-        getSocket().emit('delete');
+        getSocket().emit('delete-message', msg);
       }
     } catch (error) {
+      toast.error("Error deleting message !", toastOptions);
       console.error("Error deleting message:", error);
     }
   };
+
 
   return (
     <>
       {selectedUser && (
         <Container>
-          <ChatHeader user={selectedUser} isOnline={isOnline} />
-          {isLoading ? (
-            <PreLoader isLoading={isLoading} />
+          {fetchMsgLoader ? (
+            <PreLoader loading={fetchMsgLoader} />
           ) : (
             <div className="chat-messages">
               {messages.map((message) => (
@@ -138,16 +158,17 @@ export default function ChatContainer({ selectedUser }) {
               <div ref={scrollRef} />
             </div>
           )}
-          <ChatInput handleSendMsg={handleSendMsg} />
+          <ChatInput handleSendMsg={handleSendMsg} loading={sendLoader} />
         </Container>
       )}
+      <ToastContainer />
     </>
   );
 }
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 1fr 10%;
+  grid-template-rows: 1fr 10%;
   border-radius: 1.5rem;
   overflow: hidden;
   background-color: #1e1e1e;

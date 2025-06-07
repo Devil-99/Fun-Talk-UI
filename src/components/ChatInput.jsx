@@ -1,32 +1,45 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {IoMdSend} from 'react-icons/io';
+import { IoMdSend } from 'react-icons/io';
+import PulseLoader from "react-spinners/PulseLoader"
 
-export default function ChatInput({handleSendMsg}) {
-    const [msg,setMsg] = useState('');
+export default function ChatInput({ handleSendMsg, loading }) {
+    const [msg, setMsg] = useState('');
 
-    const sendMessege = (event)=>{
+    const sendMessege = (event) => {
         event.preventDefault();
-        if(msg.length>0){
+        if (msg.length > 0) {
             handleSendMsg(msg);
             setMsg('');
         }
     }
 
-    const handleChange = (event)=>{
+    const handleChange = (event) => {
         setMsg(event.target.value);
     }
 
-  return (
-    <Container>
-        <form className='input-container' onSubmit={(event)=>sendMessege(event)}>
-            <input type='text' placeholder='type your messege here' value={msg} onChange={handleChange} />
-            <button className='submit'>
-                <IoMdSend />
-            </button>
-        </form>
-    </Container>
-  )
+    return (
+        <Container>
+            <form className='input-container' onSubmit={(event) => sendMessege(event)}>
+                <input type='text' placeholder='type your messege here' value={msg} onChange={handleChange} />
+                <button className='submit'>
+                    {
+                        loading ?
+                            <PulseLoader
+                                color="white"
+                                loading={loading}
+                                size={5}
+                                cssOverride={{
+                                    padding: '0.5rem 0'
+                                }}
+                            />
+                            :
+                            <IoMdSend />
+                    }
+                </button>
+            </form>
+        </Container>
+    )
 };
 
 const Container = styled.div`
@@ -66,7 +79,7 @@ padding: 0.5rem 1rem 0.5rem 1rem;
         }
     }
     button{
-        padding: 0.4rem 2rem;
+        padding: 0.5rem 2rem;
         border-radius: 2rem;
         display:flex;
         justify-content: center;

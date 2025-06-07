@@ -3,21 +3,24 @@ import { usersRoute } from '../utils/apiRoutes';
 import { ToastContainer, toast } from 'react-toastify';
 import { toastOptions } from '../utils/toastOptions';
 import { useSelector } from 'react-redux';
+import { getSocket } from '../redux/slices/socketSlice';
 
 import styled from 'styled-components';
 import FunTalk from '../assets/FunTalk.png';
 import { FaUserCircle } from "react-icons/fa";
 import { RiRadioButtonLine } from "react-icons/ri";
+import PreLoader from './PreLoader';
 import axios from 'axios';
-import { getSocket } from '../redux/slices/socketSlice';
 
 export default function Contacts({ selectedUser, setSelectedUser }) {
   const currentUser = useSelector((state) => state.login.user);
   const connected = useSelector((state) => state.socket.connected);
   const [allusers, setAllusers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(usersRoute, {
         params: { user_id: currentUser.user_id }
       });
@@ -34,6 +37,9 @@ export default function Contacts({ selectedUser, setSelectedUser }) {
       } else {
         toast.error('An unexpected error occurred. Please try again.', toastOptions);
       }
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -74,38 +80,42 @@ export default function Contacts({ selectedUser, setSelectedUser }) {
   }, [connected]);
 
   return (
-    <Container>
+    <Container className={!loading ? 'with-background' : ''}>
       <div className='contacts'>
-        {allusers.length === 0 ? (
-          <p style={{ color: '#ccc' }}>No other users available.</p>
-        ) : (
-          allusers.map((user, index) => (
-            <div
-              className={`contact ${selectedUser && user.user_id === selectedUser.user_id ? "selected" : ""}`}
-              key={index}
-              onClick={() => setSelectedUser(user)}
-            >
-              <div className='username'>
-                {user.dp ? (
-                  <img
-                    src={user.dp}
-                    alt='dp'
-                    style={{ width: "1.5rem", height: "1.5rem", objectFit: "cover", borderRadius: "50%" }}
-                  />
-                ) : (
-                  <FaUserCircle style={{ fontSize: '1.5rem', color: 'gray' }} />
-                )}
-                <h3>{user.username}</h3>
-                <RiRadioButtonLine
-                  style={{
-                    color: user.online ? '#AAFF00' : 'gray',
-                    fontSize: '1rem'
-                  }}
-                />
-              </div>
-            </div>
-          ))
-        )}
+        {
+          loading ?
+            <PreLoader isLoading={true} />
+            :
+            allusers.length === 0 ? (
+              <p style={{ color: '#ccc' }}>No other users available.</p>
+            ) : (
+              allusers.map((user, index) => (
+                <div
+                  className={`contact ${selectedUser && user.user_id === selectedUser.user_id ? "selected" : ""}`}
+                  key={index}
+                  onClick={() => setSelectedUser(user)}
+                >
+                  <div className='username'>
+                    {user.dp ? (
+                      <img
+                        src={user.dp}
+                        alt='dp'
+                        style={{ width: "1.5rem", height: "1.5rem", objectFit: "cover", borderRadius: "50%" }}
+                      />
+                    ) : (
+                      <FaUserCircle style={{ fontSize: '1.5rem', color: 'gray' }} />
+                    )}
+                    <h3>{user.username}</h3>
+                    <RiRadioButtonLine
+                      style={{
+                        color: user.online ? '#AAFF00' : 'gray',
+                        fontSize: '1rem'
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
       </div>
 
       <div className='current-user'>
@@ -123,11 +133,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: url(${FunTalk}) no-repeat center center / 60%, #1f1f1f;
+  background-color: #1f1f1f;
   border-radius: 2rem;
   padding: 1rem;
   box-shadow: inset 0 0 8px #000, 0 0 10px rgba(0, 0, 0, 0.4);
 
+  &.with-background {
+    background: url(${FunTalk}) no-repeat center center / 60%, #1f1f1f;
+  }
   .contacts {
     flex: 1;
     display: flex;
@@ -148,7 +161,7 @@ const Container = styled.div`
       display: flex;
       align-items: center;
       gap: 1rem;
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(71, 71, 71, 0.50);
       border: 1px solid rgba(255, 255, 255, 0.05);
       padding: 0.75rem 1rem;
       border-radius: 1.5rem;
@@ -156,7 +169,7 @@ const Container = styled.div`
       transition: all 0.2s ease-in-out;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(121, 121, 121, 0.5);
         transform: scale(1.05);
       }
 
@@ -191,15 +204,14 @@ const Container = styled.div`
   .current-user {
     margin-top: 1rem;
     text-align: center;
-
     .username {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      background-color: #ff3305;
+      background-color:rgb(51, 50, 50);
       color: white;
-      padding: 0rem 1.5rem;
+      padding: 0.25rem 1.5rem;
       border-radius: 2rem;
       font-size: 1rem;
       font-weight: bold;
@@ -208,6 +220,13 @@ const Container = styled.div`
 
       &:hover {
         background-color: #cb0000;
+      }
+
+      h3 {
+          font-size: 1.5rem;
+          color: white;
+          margin: 0;
+          word-break: break-word;
       }
 
       @media (max-width: 500px) {

@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import ChatHeader from '../components/ChatHeader';
 // Lazy loading components to optimize performance
 const Contacts = lazy(() => import('../components/Contacts'));
 const Welcome = lazy(() => import('../components/Welcome'));
@@ -16,13 +17,16 @@ function ChatPages() {
         <Suspense fallback={<div>Loading...</div>}>
           <Contacts selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
         </Suspense>
-        {
-          !selectedUser ?
-            <Welcome currentUser={currentUser} /> :
-            <Suspense fallback={<div>Loading...</div>}>
-              <ChatContainer selectedUser={selectedUser}/>
-            </Suspense>
-        }
+        <div className='body'>
+          <ChatHeader user={selectedUser || currentUser} />
+          {
+            selectedUser ?
+              <Suspense fallback={<div>Loading...</div>}>
+                <ChatContainer selectedUser={selectedUser} />
+              </Suspense> :
+              <Welcome currentUser={currentUser} />
+          }
+        </div>
       </div>
     </Container>
   )
@@ -52,6 +56,16 @@ gap: 1rem;
   @media screen and (min-width: 250px) and (max-width: 800px){
     grid-template-columns: 30% 67%;
     gap: 0.3rem;
+  }
+
+  .body{
+    display: flex;
+    flex-direction: column;
+    color: white;
+    overflow: hidden;
+    border-radius: 1rem;
+    background-color: #252525;
+    box-shadow: 10px 10px 20px #000000;
   }
 }
 `;

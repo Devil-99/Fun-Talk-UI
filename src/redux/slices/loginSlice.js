@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const loginSlice = createSlice({
     name: "login",
     initialState: {
-        loading: true,
+        loading: false,
         user: null,
     },
     reducers: {
@@ -16,6 +16,9 @@ export const loginSlice = createSlice({
 
             localStorage.setItem('TechTalk-user', JSON.stringify(action.payload));
         },
+        loginFailure: (state) => {
+            state.loading = false;
+        },
         logout: (state) => {
             state.isLogged = false;
             state.user = null;
@@ -23,5 +26,5 @@ export const loginSlice = createSlice({
     },
 });
 
-export const { loginLoading, loginSuccess, logout } = loginSlice.actions;
+export const { loginLoading, loginSuccess, loginFailure, logout } = loginSlice.actions;
 export default loginSlice.reducer;

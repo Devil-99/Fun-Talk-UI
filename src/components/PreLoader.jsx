@@ -2,12 +2,12 @@ import React from 'react';
 import PuffLoader from "react-spinners/PuffLoader";
 import styled from 'styled-components';
 
-function PreLoader({preloader}) {
+function PreLoader({loading}) {
   return (
     <Container>
         <PuffLoader
         color="#FF5605"
-        loading={preloader}
+        loading={loading}
         size={80}
         />
     </Container>

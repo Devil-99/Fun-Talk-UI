@@ -31,12 +31,11 @@ display: flex;
 justify-content: space-between;
 background-color: #00000060;
 align-items: center;
-padding: 0 1rem;
+padding: 1rem;
 .user-details{
   display:flex;
   flex-direction:row;
   gap:0.5rem;
-  height:50%;
   cursor: pointer;
   @media screen and (min-width: 250px) and (max-width: 500px){
     h1{

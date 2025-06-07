@@ -1,19 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import PulseLoader from "react-spinners/PulseLoader"
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"; // importing the toastify css. Without this the notification will not visible.
 import axios from 'axios';
 import { loginRoute } from '../utils/apiRoutes';
 import { toastOptions } from '../utils/toastOptions';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginLoading, loginSuccess } from '../redux/slices/loginSlice';
+import { loginLoading, loginSuccess, loginFailure } from '../redux/slices/loginSlice';
 import { getSocket } from '../redux/slices/socketSlice';
 
 function LoginPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const connected = useSelector((state) => state.socket.connected);
+    const loading = useSelector(state => state.login.loading);
     const [values, setValues] = useState({
         mail: "",
         password: ""
@@ -34,9 +36,10 @@ function LoginPage() {
                     navigate('/');
                 }
             } catch (error) {
+                dispatch(loginFailure());
                 if (error.response) {
                     // Errors returned from the server (4xx, 5xx responses)
-                    const { status, data } = error.response;
+                    const { data } = error.response;
                     toast.error(data.message, toastOptions);
                 } else if (error.request) {
                     // No response from server (network issue)
@@ -75,7 +78,17 @@ function LoginPage() {
                     </div>
                     <input type="text" placeholder='Email' name='mail' onChange={(e) => handleChange(e)} />
                     <input type="password" placeholder='Password' name='password' onChange={(e) => handleChange(e)} />
-                    <button type='submit' onClick={handleSubmit}>Login</button>
+                    <button type='submit' onClick={handleSubmit}>
+                        {
+                            loading ?
+                                <PulseLoader
+                                    color="white"
+                                    loading={loading}
+                                    size={10}
+                                /> :
+                                'Login'
+                        }
+                    </button>
                     <span>Don't have an account ? <Link to="/register">Register</Link></span>
                 </form>
             </FormContainer>
